@@ -31,6 +31,11 @@ module SemanticRange
   FULLPLAIN = /v?#{MAINVERSION}#{PRERELEASE}#{BUILD}?/
   FULL = /^#{FULLPLAIN}$/
   LOOSE = /^#{LOOSEPLAIN}$/
+  TILDE = /^#{LONETILDE}#{XRANGEPLAIN}$/
+  TILDELOOSE = /^#{LONETILDE}#{XRANGEPLAINLOOSE}$/
+  XRANGE = /^#{GTLT}\s*#{XRANGEPLAIN}$/
+  XRANGELOOSE = /^#{GTLT}\s*#{XRANGEPLAINLOOSE}$/
+
 
   MAX_LENGTH = 256
 
@@ -231,12 +236,12 @@ module SemanticRange
         if isX(mj)
           ret = ''
         elsif isX(m)
-          ret = '>=' + mj + '.0.0 <' + (+mj + 1) + '.0.0'
+          ret = '>=' + mj + '.0.0 <' + (mj.to_i + 1) + '.0.0'
         elsif isX(p)
           if mj == '0'
-            ret = '>=' + mj + '.' + m + '.0 <' + mj + '.' + (+m + 1) + '.0'
+            ret = '>=' + mj + '.' + m + '.0 <' + mj + '.' + (m.to_i + 1) + '.0'
           else
-            ret = '>=' + mj + '.' + m + '.0 <' + (+mj + 1) + '.0.0'
+            ret = '>=' + mj + '.' + m + '.0 <' + (mj.to_i + 1) + '.0.0'
           end
         elsif pr
           if pr[0] != '-'
@@ -248,11 +253,11 @@ module SemanticRange
                     ' <' + mj + '.' + m + '.' + (+p + 1);
             else
               ret = '>=' + mj + '.' + m + '.' + p + pr +
-                    ' <' + mj + '.' + (+m + 1) + '.0'
+                    ' <' + mj + '.' + (m.to_i + 1) + '.0'
             end
           else
             ret = '>=' + mj + '.' + m + '.' + p + pr +
-                  ' <' + (+mj + 1) + '.0.0'
+                  ' <' + (mj.to_i + 1) + '.0.0'
           end
         else
           if mj == '0'
@@ -261,11 +266,11 @@ module SemanticRange
                     ' <' + mj + '.' + m + '.' + (+p + 1)
             else
               ret = '>=' + mj + '.' + m + '.' + p +
-                    ' <' + mj + '.' + (+m + 1) + '.0'
+                    ' <' + mj + '.' + (m.to_i + 1) + '.0'
             end
           else
             ret = '>=' + mj + '.' + m + '.' + p +
-                  ' <' + (+mj + 1) + '.0.0'
+                  ' <' + (mj.to_i + 1) + '.0.0'
           end
         end
         ret
@@ -273,13 +278,99 @@ module SemanticRange
     end
 
     def replace_tildes(comp, loose)
-      # TODO
-      comp
+      comp.strip.split(/\s+/).map do |comp|
+        replace_tilde(comp, loose)
+      end.join(' ')
+    end
+
+    def replace_tilde(comp, loose)
+      comp.gsub(loose ? TILDELOOSE : TILDE) do
+        match = Regexp.last_match
+        mj = match[1]
+        m = match[2]
+        p = match[3]
+        pr = match[4]
+
+        if isX(mj)
+          ret = ''
+        elsif isX(m)
+          ret = '>=' + mj + '.0.0 <' + (mj.to_i + 1) + '.0.0'
+        elsif isX(p)
+          ret = '>=' + mj + '.' + m + '.0 <' + mj + '.' + (m.to_i + 1) + '.0'
+        elsif pr
+          pr = '-' + pr if (pr[0] != '-')
+          ret = '>=' + mj + '.' + m + '.' + p + pr +
+                ' <' + mj + '.' + (m.to_i + 1) + '.0'
+        else
+          ret = '>=' + mj + '.' + m + '.' + p +
+                ' <' + mj + '.' + (m.to_i + 1) + '.0'
+        end
+        ret
+      end
     end
 
     def replace_x_ranges(comp, loose)
-      # TODO
-      comp
+      comp.strip.split(/\s+/).map do |comp|
+        replace_x_range(comp, loose)
+      end.join(' ')
+    end
+
+    def replace_x_range(comp, loose)
+      comp = comp.strip
+      comp.gsub(loose ? XRANGELOOSE : XRANGE) do
+        match = Regexp.last_match
+        ret = match[0]
+        gtlt = match[1]
+        mj = match[2]
+        m = match[3]
+        p = match[4]
+        pr = match[5]
+
+        xM = isX(mj)
+        xm = xM || isX(m)
+        xp = xm || isX(p)
+        anyX = xp
+
+        gtlt = '' if gtlt == '=' && anyX
+
+        if xM
+          if gtlt == '>' || gtlt == '<'
+            ret = '<0.0.0'
+          else
+            ret = '*'
+          end
+        elsif gtlt && anyX
+          m = 0 if xm
+          p = 0 if xp
+
+          if gtlt == '>'
+            gtlt = '>='
+            if xm
+              mj = mj.to_i + 1
+              m = 0
+              p = 0
+            elsif xp
+              m = m.to_i + 1
+              p = 0
+            end
+          elsif gtlt == '<='
+            gtlt = '<'
+            if xm
+              mj = mj.to_i + 1
+            else
+              m = m.to_i + 1
+            end
+          end
+
+          ret = gtlt + mj + '.' + m + '.' + p
+        elsif xm
+          ret = '>=' + mj + '.0.0 <' + (mj.to_i + 1) + '.0.0'
+        elsif xp
+          ret = '>=' + mj + '.' + m + '.0 <' + mj + '.' + (m.to_i + 1) + '.0'
+        end
+
+        ret
+      end
     end
 
     def replace_stars(comp, loose)
