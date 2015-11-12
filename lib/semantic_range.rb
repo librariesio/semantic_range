@@ -48,6 +48,10 @@ module SemanticRange
     outside(version, range, '<', loose)
   end
 
+  def self.gtr(version, range, loose = false)
+    outside(version, range, '>', loose)
+  end
+
   def self.outside(version, range, hilo, loose = false)
     version = Version.new(version, loose)
     range = Range.new(range, loose)
