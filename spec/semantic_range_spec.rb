@@ -6,7 +6,7 @@ describe SemanticRange do
   end
 
   it 'statisfies' do
-    expect(SemanticRange.satisfies('1.2.1', '1.2.1')).to eq(true)
+    expect(SemanticRange.satisfies('1.2.4', '~ 1.2.3')).to eq(true)
   end
 
   it 'less than' do

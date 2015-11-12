@@ -50,6 +50,7 @@ module SemanticRange
 
   def self.outside(version, range, hilo, loose = false)
     return false if satisfies(version, range, loose)
+    # TODO
   end
 
   def self.satisfies(version, range, loose = false)

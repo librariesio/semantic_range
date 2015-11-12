@@ -1,30 +1,46 @@
 module SemanticRange
   class Range
-    def initialize(raw, loose)
-      @raw = raw
+    def initialize(range, loose)
+      return range if range.is_a?(Range) && range.loose == loose
+
+      @raw = range
       @loose = loose
+
+      @set = range.split(/\s*\|\|\s*/).map do |range|
+        parse_range(range.strip)
+      end
+
+      raise 'Invalid SemVer Range: ' + range if @set.empty?
+
+      format
+    end
+
+    def format
+      @range = @set.map do |comps|
+        comps.join(' ').strip
+      end.join('||').strip
+      @range;
     end
 
     def set
-      @raw.split(/\s*\|\|\s*/).map do |range|
-        parse_range(range.strip, @loose)
-      end
+      @set
     end
 
     def test(version)
       return false if !version
-      set.any?{|s| test_set(s, version) }
+      @set.any?{|s| test_set(s, version) }
     end
 
     def test_set(set, version)
-      return false if set.any?{|comp| comp.test(version) }
+      return false if set.none?{|comp| comp.test(version) }
 
       # TODO prereleases
+      true
     end
 
-    def parse_range(range, loose)
+    def parse_range(range)
       # expand hyphens
-      range = range.gsub(loose ? HYPHENRANGELOOSE : HYPHENRANGE){ hyphen_replace(Regexp.last_match) }
+      range = range.gsub(@loose ? HYPHENRANGELOOSE : HYPHENRANGE){ hyphen_replace(Regexp.last_match) }
 
       # comparator trim
       range = range.gsub(COMPARATORTRIM, '\1\2\3')
@@ -39,14 +55,14 @@ module SemanticRange
       range = range.split(/\s+/).join(' ')
 
       set = range.split(' ').map do |comp|
-        parseComparator(comp, loose)
+        parseComparator(comp, @loose)
       end.join(' ').split(/\s+/)
 
-      if loose
+      if @loose
         set = set.select{|comp| !!comp.match(COMPARATORLOOSE)  }
       end
 
-      set.map{|comp| Comparator.new(comp, loose) }
+      set.map{|comp| Comparator.new(comp, @loose) }
     end
 
     def isX(id)
@@ -203,7 +219,7 @@ module SemanticRange
             end
           end
 
-          ret = gtlt + mj + '.' + m + '.' + p
+          ret = "#{gtlt}#{mj}.#{m}.#{p}"
         elsif xm
           ret = '>=' + mj + '.0.0 <' + (mj.to_i + 1) + '.0.0'
         elsif xp

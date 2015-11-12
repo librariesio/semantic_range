@@ -11,7 +11,6 @@ module SemanticRange
       end
 
       match = version.strip.match(loose ? LOOSE : FULL)
-
       # TODO error handling
 
       @major = match[1].to_i
