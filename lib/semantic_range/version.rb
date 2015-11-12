@@ -52,6 +52,10 @@ module SemanticRange
       @patch
     end
 
+    def prerelease
+      @prerelease
+    end
+
     def format
       v = "#{@major}.#{@minor}.#{@patch}"
       if @prerelease.length > 0
@@ -66,20 +70,20 @@ module SemanticRange
 
     def compare(other)
       other = Version.new(other, @loose) unless other.is_a?(Version)
-      compare_main(other) || compare_pre(other)
+      compare_main(other) | compare_pre(other)
     end
 
     def compare_main(other)
       other = Version.new(other, @loose) unless other.is_a?(Version)
-      compare_identifiers(@major, other.major) || compare_identifiers(@minor, other.minor) || compare_identifiers(@patch, other.patch)
+      compare_identifiers(@major, other.major) | compare_identifiers(@minor, other.minor) | compare_identifiers(@patch, other.patch)
     end
 
     def compare_pre(other)
       other = Version.new(other, @loose) unless other.is_a?(Version)
 
-      return -1 if @prerelease.any? && !other.prerelease.any?
-      return 1 if !@prerelease.any? && other.prerelease.any?
-      return 0 if !@prerelease.any? && !other.prerelease.any?
+      return -1 if !@prerelease.nil? && other.prerelease.nil?
+      return 1 if @prerelease.nil? && !other.prerelease.nil?
+      return 0 if @prerelease.nil? && other.prerelease.nil?
 
       i = 0
       while true

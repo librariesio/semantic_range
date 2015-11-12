@@ -36,12 +36,17 @@ module SemanticRange
 
     def test(version)
       return false if !version
-      @set.any?{|s| test_set(s, version) }
+      @set.any?{|s|  }
+      @set.each do |s|
+        return true if test_set(s, version)
+      end
+      false
     end
 
     def test_set(set, version)
-      return false if set.none?{|comp| comp.test(version) }
-
+      set.each do |comp|
+        return false if (!comp.test(version))
+      end
       # TODO prereleases
       true
     end

@@ -20,6 +20,14 @@ module SemanticRange
       end
     end
 
+    def semver
+      @semver
+    end
+
+    def operator
+      @operator
+    end
+
     def to_s
       @value
     end
