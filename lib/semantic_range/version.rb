@@ -6,6 +6,10 @@ module SemanticRange
       @raw = version
       @loose = loose
 
+      if version.is_a?(Version)
+        return version
+      end
+
       match = version.strip.match(loose ? LOOSE : FULL)
 
       # TODO error handling
@@ -98,8 +102,8 @@ module SemanticRange
     end
 
     def compare_identifiers(a,b)
-      anum = /^[0-9]+$/.match(a)
-      bnum = /^[0-9]+$/.match(b)
+      anum = /^[0-9]+$/.match(a.to_s)
+      bnum = /^[0-9]+$/.match(b.to_s)
 
       if anum && bnum
         a = a.to_i
