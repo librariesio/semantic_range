@@ -32,6 +32,10 @@ module SemanticRange
       @value
     end
 
+    def value
+      @value
+    end
+
     def test(version)
       return true if @semver == ANY
       version = Version.new(version, @loose) if version.is_a?(String)

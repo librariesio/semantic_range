@@ -71,9 +71,7 @@ module SemanticRange
         parseComparator(comp, @loose)
       end.join(' ').split(/\s+/)
 
-      if @loose
-        set = set.select{|comp| !!comp.match(COMPARATORLOOSE)  }
-      end
+      set = set.select{|comp| !!comp.match(COMPARATORLOOSE) } if @loose
 
       set.map{|comp| Comparator.new(comp, @loose) }
     end
@@ -120,7 +118,7 @@ module SemanticRange
           if mj == '0'
             if m == '0'
               ret = '>=' + mj + '.' + m + '.' + p + pr +
-                    ' <' + mj + '.' + m + '.' + (+p + 1);
+                    ' <' + mj + '.' + m + '.' + (p.to_i + 1);
             else
               ret = '>=' + mj + '.' + m + '.' + p + pr +
                     ' <' + mj + '.' + (m.to_i + 1) + '.0'
@@ -132,15 +130,12 @@ module SemanticRange
         else
           if mj == '0'
             if m == '0'
-              ret = '>=' + mj + '.' + m + '.' + p +
-                    ' <' + mj + '.' + m + '.' + (+p + 1)
+              ret = ">=#{mj}.#{m}.#{p} <#{mj}.#{m}.#{(p.to_i + 1)}"
             else
-              ret = '>=' + mj + '.' + m + '.' + p +
-                    ' <' + mj + '.' + (m.to_i + 1) + '.0'
+              ret = ">=#{mj}.#{m}.#{p} <#{mj}.#{(m.to_i + 1)}.0"
             end
           else
-            ret = '>=' + mj + '.' + m + '.' + p +
-                  ' <' + (mj.to_i + 1) + '.0.0'
+            ret = ">=#{mj}.#{m}.#{p} <#{(mj.to_i + 1)}.0.0"
           end
         end
         ret
@@ -172,8 +167,7 @@ module SemanticRange
           ret = '>=' + mj + '.' + m + '.' + p + pr +
                 ' <' + mj + '.' + (m.to_i + 1) + '.0'
         else
-          ret = '>=' + mj + '.' + m + '.' + p +
-                ' <' + mj + '.' + (m.to_i + 1).to_s + '.0'
+          ret = ">=#{mj}.#{m}.#{p} < #{mj}.#{(m.to_i + 1)}.0"
         end
         ret
       end

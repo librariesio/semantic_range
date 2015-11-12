@@ -67,10 +67,11 @@ describe SemanticRange do
   end
 
   it 'gtr' do
-    expect(SemanticRange.gtr('1.2.4', '~1.3.0', false)).to eq(false)
-    expect(SemanticRange.gtr('1.2.4', '>=1.3.0', false)).to eq(false)
-    expect(SemanticRange.gtr('1.2.4', '1.2.4', false)).to eq(false)
-    expect(SemanticRange.gtr('1.2.4', '1.2', false)).to eq(true)
-    expect(SemanticRange.gtr('1.2.4', '>1.1.0', false)).to eq(true)
+    expect(SemanticRange.gtr('1.3.0', '~1.2.2', false)).to eq(true)
+    expect(SemanticRange.gtr('0.7.1-1', '~0.6.1-1', false)).to eq(true)
+    expect(SemanticRange.gtr('2.0.1', '1.0.0 - 2.0.0', false)).to eq(true)
+    expect(SemanticRange.gtr('1.0.1-beta1', '1.0.0', false)).to eq(true)
+    expect(SemanticRange.gtr('2.0.0', '1.0.0', false)).to eq(true)
+    expect(SemanticRange.gtr('2.1.1', '<=2.0.0', false)).to eq(true)
   end
 end
