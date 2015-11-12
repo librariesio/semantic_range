@@ -49,8 +49,57 @@ module SemanticRange
   end
 
   def self.outside(version, range, hilo, loose = false)
+    version = Version.new(version, loose)
+    range = Range.new(range, loose)
+
     return false if satisfies(version, range, loose)
-    # TODO
+
+    range.set.each do |comparators|
+      high = nil
+      low = nil
+
+      comparators.each do |comparator|
+        if comparator.semver == ANY
+          comparator = Comparator.new('>=0.0.0', loose)
+        end
+
+        high = comparator
+        low = comparator
+
+        case hilo
+        when '>'
+          if gt(comparator.semver, high.semver, loose)
+            high = comparator
+          elsif lt(comparator.semver, low.semver, loose)
+            low = comparator
+          end
+        when '<'
+          if lt(comparator.semver, high.semver, loose)
+            high = comparator
+          elsif gt(comparator.semver, low.semver, loose)
+            low = comparator
+          end
+        end
+      end
+
+      return false if (high.operator == comp || high.operator == ecomp)
+
+      case hilo
+      when '>'
+        if (!low.operator || low.operator == comp) && lte(version, low.semver)
+          return false;
+        elsif (low.operator === ecomp && lt(version, low.semver))
+          return false;
+        end
+      when '<'
+        if (!low.operator || low.operator == comp) && gte(version, low.semver)
+          return false;
+        elsif (low.operator === ecomp && gt(version, low.semver))
+          return false;
+        end
+      end
+    end
+    true
   end
 
   def self.satisfies(version, range, loose = false)
