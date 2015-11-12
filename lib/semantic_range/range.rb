@@ -1,7 +1,7 @@
 module SemanticRange
   class Range
     def initialize(range, loose)
-      return range if range.is_a?(Range) && range.loose == loose
+      range = range.raw if range.is_a?(Range)
 
       @raw = range
       @loose = loose
@@ -19,11 +19,15 @@ module SemanticRange
       @loose
     end
 
+    def raw
+      @raw
+    end
+
     def format
       @range = @set.map do |comps|
         comps.join(' ').strip
       end.join('||').strip
-      @range;
+      @range
     end
 
     def set
