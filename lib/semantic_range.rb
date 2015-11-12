@@ -59,12 +59,48 @@ module SemanticRange
     # TODO
   end
 
+  def self.compare(a, b, loose)
+    Version.new(a, loose).compare(b)
+  end
+
+  def self.compare_loose(a, b)
+    compare(a, b, true)
+  end
+
   def self.rcompare(a, b, loose)
+    compare(b, a, true)
+  end
+
+  def self.sort(list, loose)
     # TODO
   end
 
-  def self.compare(a, b, loose)
+  def self.rsort(list, loose)
     # TODO
+  end
+
+  def self.lt(a, b, loose)
+    compare(a, b, loose) < 0
+  end
+
+  def self.gt(a, b, loose)
+    compare(a, b, loose) > 0
+  end
+
+  def self.eq(a, b, loose)
+    compare(a, b, loose) == 0
+  end
+
+  def self.neq(a, b, loose)
+    compare(a, b, loose) != 0
+  end
+
+  def self.gte(a, b, loose)
+    compare(a, b, loose) >= 0
+  end
+
+  def self.lte(a, b, loose)
+    compare(a, b, loose) <= 0
   end
 
   def self.valid(version, loose = false)
@@ -145,6 +181,18 @@ module SemanticRange
       @version
     end
 
+    def major
+      @major
+    end
+
+    def minor
+      @minor
+    end
+
+    def patch
+      @patch
+    end
+
     def format
       v = "#{@major}.#{@minor}.#{@patch}"
       if @prerelease.length > 0
@@ -155,6 +203,58 @@ module SemanticRange
 
     def to_s
       @version
+    end
+
+    def compare(other)
+      other = Version.new(other, @loose) unless other.is_a?(Version)
+      compare_main(other) || compare_pre(other)
+    end
+
+    def compare_main(other)
+      other = Version.new(other, @loose) unless other.is_a?(Version)
+      compare_identifiers(@major, other.major) || compare_identifiers(@minor, other.minor) || compare_identifiers(@patch, other.patch)
+    end
+
+    def compare_pre(other)
+      other = Version.new(other, @loose) unless other.is_a?(Version)
+
+      return -1 if @prerelease.any? && !other.prerelease.any?
+      return 1 if !@prerelease.any? && other.prerelease.any?
+      return 0 if !@prerelease.any? && !other.prerelease.any?
+
+      i = 0
+      while true
+        a = @prerelease[i]
+        b = other.prerelease[i]
+
+        if a.nil? && b.nil?
+          return 0
+        elsif b.nil?
+          return 1
+        elsif a.nil?
+          return -1
+        elsif a == b
+          i += 1
+        else
+          return compareIdentifiers(a, b)
+        end
+      end
+    end
+
+    def compare_identifiers(a,b)
+      anum = /^[0-9]+$/.match(a)
+      bnum = /^[0-9]+$/.match(b)
+
+      if anum && bnum
+        a = a.to_i
+        b = b.to_i
+      end
+
+      return (anum && !bnum) ? -1 :
+             (bnum && !anum) ? 1 :
+             a < b ? -1 :
+             a > b ? 1 :
+             0;
     end
   end
 
