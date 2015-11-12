@@ -104,16 +104,16 @@ module SemanticRange
         if isX(mj)
           ret = ''
         elsif isX(m)
-          ret = '>=' + mj + '.0.0 <' + (mj.to_i + 1) + '.0.0'
+          ret = ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
         elsif isX(p)
           if mj == '0'
-            ret = '>=' + mj + '.' + m + '.0 <' + mj + '.' + (m.to_i + 1) + '.0'
+            ret = ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
           else
-            ret = '>=' + mj + '.' + m + '.0 <' + (mj.to_i + 1) + '.0.0'
+            ret = ">=#{mj}.#{m}.0 <#{(mj.to_i + 1)}.0.0"
           end
         elsif pr
           if pr[0] != '-'
-            pr = '-' + pr
+            pr = "-#{pr}"
           end
           if mj == '0'
             if m == '0'
