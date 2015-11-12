@@ -54,6 +54,15 @@ module SemanticRange
 
     return false if satisfies(version, range, loose)
 
+    case hilo
+    when '>'
+      comp = '>'
+      ecomp = '>='
+    when '<'
+      comp = '<'
+      ecomp = '<='
+    end
+
     range.set.each do |comparators|
       high = nil
       low = nil
@@ -88,13 +97,13 @@ module SemanticRange
       when '>'
         if (!low.operator || low.operator == comp) && lte(version, low.semver)
           return false;
-        elsif (low.operator === ecomp && lt(version, low.semver))
+        elsif (low.operator == ecomp && lt(version, low.semver))
           return false;
         end
       when '<'
         if (!low.operator || low.operator == comp) && gte(version, low.semver)
           return false;
-        elsif (low.operator === ecomp && gt(version, low.semver))
+        elsif (low.operator == ecomp && gt(version, low.semver))
           return false;
         end
       end
