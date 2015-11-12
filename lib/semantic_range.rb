@@ -56,7 +56,11 @@ module SemanticRange
   end
 
   def self.valid_range(range, loose = false)
-    # TODO
+    begin
+      Range.new(range, loose).range || '*'
+    rescue
+      nil
+    end
   end
 
   def self.compare(a, b, loose)
