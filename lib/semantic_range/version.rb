@@ -13,9 +13,9 @@ module SemanticRange
       match = version.strip.match(loose ? LOOSE : FULL)
       # TODO error handling
 
-      @major = match[1].to_i
-      @minor = match[2].to_i
-      @patch = match[3].to_i
+      @major = match[1] ? match[1].to_i : 0
+      @minor = match[2] ? match[2].to_i : 0
+      @patch = match[3] ? match[3].to_i : 0
 
       # TODO error handling
 
