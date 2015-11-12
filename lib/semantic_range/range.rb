@@ -27,13 +27,13 @@ module SemanticRange
       range = range.gsub(loose ? HYPHENRANGELOOSE : HYPHENRANGE){ hyphen_replace(Regexp.last_match) }
 
       # comparator trim
-      range = range.gsub(COMPARATORTRIM, '$1$2$3')
+      range = range.gsub(COMPARATORTRIM, '\1\2\3')
 
       # tilde trim
-      range = range.gsub(TILDETRIM, '$1~')
+      range = range.gsub(TILDETRIM, '\1~')
 
       # caret trim
-      range = range.gsub(CARETTRIM, '$1^')
+      range = range.gsub(CARETTRIM, '\1^')
 
       # normalise spaces
       range = range.split(/\s+/).join(' ')
@@ -144,7 +144,7 @@ module SemanticRange
                 ' <' + mj + '.' + (m.to_i + 1) + '.0'
         else
           ret = '>=' + mj + '.' + m + '.' + p +
-                ' <' + mj + '.' + (m.to_i + 1) + '.0'
+                ' <' + mj + '.' + (m.to_i + 1).to_s + '.0'
         end
         ret
       end
