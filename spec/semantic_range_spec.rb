@@ -63,6 +63,7 @@ describe SemanticRange do
       loose = tuple[2] || false
       puts tuple
       expect(SemanticRange.gt(v0, v1, loose)).to eq(true)
+      expect(SemanticRange.lt(v1, v0, loose)).to eq(true)
     end
   end
 

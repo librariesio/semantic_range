@@ -70,16 +70,18 @@ module SemanticRange
 
     def compare(other)
       other = Version.new(other, @loose) unless other.is_a?(Version)
-      compare_main(other) | compare_pre(other)
+      res = truthy(compare_main(other)) || truthy(compare_pre(other))
+      res.is_a?(FalseClass) ? 0 : res
     end
 
     def compare_main(other)
       other = Version.new(other, @loose) unless other.is_a?(Version)
-      compare_identifiers(@major, other.major) | compare_identifiers(@minor, other.minor) | compare_identifiers(@patch, other.patch)
+      truthy(compare_identifiers(@major, other.major)) || truthy(compare_identifiers(@minor, other.minor)) || truthy(compare_identifiers(@patch, other.patch))
     end
 
     def truthy(val)
-      val.zero? ? false : true
+      return val unless val.is_a?(Integer)
+      val.zero? ? false : val
     end
 
     def compare_pre(other)
