@@ -45,7 +45,7 @@ module SemanticRange
 
     def test_set(set, version)
       set.each do |comp|
-        return false if (!comp.test(version))
+        return false if !comp.test(version)
       end
       if version.prerelease.length > 0
         set.each do |comp|
@@ -210,7 +210,7 @@ module SemanticRange
           else
             ret = '*'
           end
-        elsif gtlt && anyX
+        elsif !gtlt.nil? && gtlt != '' && anyX
           m = 0 if xm
           p = 0 if xp
 
