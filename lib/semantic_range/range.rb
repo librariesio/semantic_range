@@ -173,7 +173,7 @@ module SemanticRange
           pr = '-' + pr if (pr[0] != '-')
           ret = ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{(m.to_i + 1)}.0"
         else
-          ret = ">=#{mj}.#{m}.#{p} < #{mj}.#{(m.to_i + 1)}.0"
+          ret = ">=#{mj}.#{m}.#{p} <#{mj}.#{(m.to_i + 1)}.0"
         end
         ret
       end
@@ -280,7 +280,7 @@ module SemanticRange
       elsif tpr
         to = "<=#{tM}.#{tm}.#{tp}-#{tpr}"
       else
-        to "<=#{to}"
+        to = "<=#{to}"
       end
 
       "#{from} #{to}".strip
