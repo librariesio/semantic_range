@@ -129,11 +129,4 @@ describe SemanticRange do
     expect(SemanticRange.gte('2.2.4', '1.2.2', false)).to eq(true)
     expect(SemanticRange.gte('2.2.4', '2.1.2', false)).to eq(true)
   end
-
-  it 'ltr' do
-    expect(SemanticRange.ltr('1.2.4', '~1.3.0', false)).to eq(true)
-    expect(SemanticRange.ltr('1.2.4', '>=1.3.0', false)).to eq(true)
-    expect(SemanticRange.ltr('1.2.4', '1.2.4', false)).to eq(false)
-    expect(SemanticRange.ltr('1.2.4', '1.2', false)).to eq(false)
-  end
 end
