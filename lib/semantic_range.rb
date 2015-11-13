@@ -52,7 +52,7 @@ module SemanticRange
     outside(version, range, '>', loose)
   end
 
-  def cmp(a, op, b, loose)
+  def self.cmp(a, op, b, loose)
     case op
     when '==='
       a = a.version if !a.is_a?(String)

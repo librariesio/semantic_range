@@ -61,9 +61,18 @@ describe SemanticRange do
       v0 = tuple[0]
       v1 = tuple[1]
       loose = tuple[2] || false
-      puts tuple
+      puts tuple.inspect
       expect(SemanticRange.gt(v0, v1, loose)).to eq(true)
       expect(SemanticRange.lt(v1, v0, loose)).to eq(true)
+      expect(SemanticRange.lt(v0, v1, loose)).to eq(false)
+      expect(SemanticRange.gt(v1, v0, loose)).to eq(false)
+      expect(SemanticRange.eq(v0, v0, loose)).to eq(true)
+      expect(SemanticRange.eq(v1, v1, loose)).to eq(true)
+      expect(SemanticRange.neq(v0, v1, loose)).to eq(true)
+      expect(SemanticRange.cmp(v1, '==', v1, loose)).to eq(true)
+      expect(SemanticRange.cmp(v0, '>=', v1, loose)).to eq(true)
+      expect(SemanticRange.cmp(v1, '<=', v0, loose)).to eq(true)
+      expect(SemanticRange.cmp(v0, '!=', v1, loose)).to eq(true)
     end
   end
 
