@@ -52,7 +52,7 @@ module SemanticRange
     outside(version, range, '>', loose)
   end
 
-  def self.cmp(a, op, b, loose)
+  def self.cmp(a, op, b, loose = false)
     case op
     when '==='
       a = a.version if !a.is_a?(String)
@@ -158,7 +158,7 @@ module SemanticRange
     end
   end
 
-  def self.compare(a, b, loose)
+  def self.compare(a, b, loose = false)
     Version.new(a, loose).compare(b)
   end
 
@@ -166,39 +166,39 @@ module SemanticRange
     compare(a, b, true)
   end
 
-  def self.rcompare(a, b, loose)
+  def self.rcompare(a, b, loose = false)
     compare(b, a, true)
   end
 
-  def self.sort(list, loose)
+  def self.sort(list, loose = false)
     # TODO
   end
 
-  def self.rsort(list, loose)
+  def self.rsort(list, loose = false)
     # TODO
   end
 
-  def self.lt(a, b, loose)
+  def self.lt(a, b, loose = false)
     compare(a, b, loose) < 0
   end
 
-  def self.gt(a, b, loose)
+  def self.gt(a, b, loose = false)
     compare(a, b, loose) > 0
   end
 
-  def self.eq(a, b, loose)
+  def self.eq(a, b, loose = false)
     compare(a, b, loose) == 0
   end
 
-  def self.neq(a, b, loose)
+  def self.neq(a, b, loose = false)
     compare(a, b, loose) != 0
   end
 
-  def self.gte(a, b, loose)
+  def self.gte(a, b, loose = false)
     compare(a, b, loose) >= 0
   end
 
-  def self.lte(a, b, loose)
+  def self.lte(a, b, loose = false)
     compare(a, b, loose) <= 0
   end
 
