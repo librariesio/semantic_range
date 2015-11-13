@@ -80,6 +80,7 @@ module SemanticRange
       set = range.split(' ').map do |comp|
         parse_comparator(comp, @loose)
       end.join(' ').split(/\s+/)
+      set = [''] if set == []
 
       set = set.select{|comp| !!comp.match(COMPARATORLOOSE) } if @loose
 
