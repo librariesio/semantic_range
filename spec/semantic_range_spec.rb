@@ -93,6 +93,11 @@ describe SemanticRange do
     expect(SemanticRange.gt('2.2.4', '2.2.2', false)).to eq(true)
     expect(SemanticRange.gt('2.2.4', '1.2.2', false)).to eq(true)
     expect(SemanticRange.gt('2.2.4', '2.1.2', false)).to eq(true)
+
+    expect(SemanticRange.gt('1.4.0', '1.4.0', false)).to eq(false)
+    expect(SemanticRange.gt('1.4.0', SemanticRange::Version.new('1.4.0', false), false)).to eq(false)
+    expect(SemanticRange.gt(SemanticRange::Version.new('1.4.0', false), '1.4.0', false)).to eq(false)
+    expect(SemanticRange.gt(SemanticRange::Version.new('1.4.0', false), SemanticRange::Version.new('1.4.0', false), false)).to eq(false)
   end
 
   it 'eq' do

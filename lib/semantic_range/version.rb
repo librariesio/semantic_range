@@ -7,7 +7,7 @@ module SemanticRange
       @loose = loose
 
       if version.is_a?(Version)
-        return version
+        @raw = version = version.raw
       end
 
       match = version.strip.match(loose ? LOOSE : FULL)
@@ -38,6 +38,10 @@ module SemanticRange
 
     def version
       @version
+    end
+
+    def raw
+      @raw
     end
 
     def major
