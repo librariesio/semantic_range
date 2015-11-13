@@ -61,7 +61,6 @@ describe SemanticRange do
       v0 = tuple[0]
       v1 = tuple[1]
       loose = tuple[2] || false
-      puts tuple.inspect
       expect(SemanticRange.gt(v0, v1, loose)).to eq(true)
       expect(SemanticRange.lt(v1, v0, loose)).to eq(true)
       expect(SemanticRange.lt(v0, v1, loose)).to eq(false)
