@@ -152,7 +152,9 @@ module SemanticRange
 
   def self.valid_range(range, loose = false)
     begin
-      Range.new(range, loose).range || '*'
+      r = Range.new(range, loose).range
+      r = '*' if r.nil? || r.empty?
+      r
     rescue
       nil
     end

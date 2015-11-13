@@ -24,6 +24,10 @@ module SemanticRange
       @raw
     end
 
+    def range
+      @range
+    end
+
     def format
       @range = @set.map do |comps|
         comps.join(' ').strip
