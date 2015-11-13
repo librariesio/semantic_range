@@ -47,8 +47,18 @@ module SemanticRange
       set.each do |comp|
         return false if (!comp.test(version))
       end
-      # TODO prereleases
-      true
+      if !version.prerelease.nil?
+        set.each do |comp|
+          next if comp.semver == ANY
+
+          if comp.semver.prerelease.length > 0
+            allowed = comp.semver
+            return true if allowed.major == version.major && allowed.minor == version.minor && allowed.patch == version.patch
+          end
+        end
+        return false
+      end
+      return true
     end
 
     def parse_range(range)
