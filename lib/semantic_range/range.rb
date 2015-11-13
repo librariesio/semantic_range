@@ -36,7 +36,6 @@ module SemanticRange
 
     def test(version)
       return false if !version
-      @set.any?{|s|  }
       @set.each do |s|
         return true if test_set(s, version)
       end
@@ -47,7 +46,7 @@ module SemanticRange
       set.each do |comp|
         return false if (!comp.test(version))
       end
-      if !version.prerelease.nil?
+      if version.prerelease.length > 0
         set.each do |comp|
           next if comp.semver == ANY
 
