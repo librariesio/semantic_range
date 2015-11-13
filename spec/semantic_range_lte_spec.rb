@@ -4,8 +4,8 @@ describe SemanticRange do
   it 'ltr' do
     # [version, range, loose]
     # Version should be less than range
-    expect(SemanticRange.ltr('~1.3.0', '1.2.4', false)).to eq(true)
-    expect(SemanticRange.ltr('>=1.3.0', '1.2.4', false)).to eq(true)
+    expect(SemanticRange.ltr('1.2.4', '~1.3.0', false)).to eq(true)
+    expect(SemanticRange.ltr('1.2.4', '>=1.3.0', false)).to eq(true)
     expect(SemanticRange.ltr('1.2.1', '~1.2.2', false)).to eq(true)
     expect(SemanticRange.ltr('0.6.1-0', '~0.6.1-1', false)).to eq(true)
     expect(SemanticRange.ltr('0.0.1', '1.0.0 - 2.0.0', false)).to eq(true)
