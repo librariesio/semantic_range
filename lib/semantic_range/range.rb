@@ -37,6 +37,7 @@ module SemanticRange
 
     def test(version)
       return false if !version
+      version = Version.new(version, @loose) if version.is_a?(String)
       @set.each do |s|
         return true if test_set(s, version)
       end
