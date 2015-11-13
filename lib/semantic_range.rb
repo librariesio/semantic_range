@@ -52,6 +52,33 @@ module SemanticRange
     outside(version, range, '>', loose)
   end
 
+  def cmp(a, op, b, loose)
+    case op
+    when '==='
+      a = a.version if !a.is_a?(String)
+      b = b.version if !b.is_a?(String)
+      a == b
+    when '!=='
+      a = a.version if !a.is_a?(String)
+      b = b.version if !b.is_a?(String)
+      a != b
+    when '', '=', '=='
+      eq(a, b, loose)
+    when '!='
+      neq(a, b, loose)
+    when '>'
+      gt(a, b, loose)
+    when '>='
+      gte(a, b, loose)
+    when '<'
+      lt(a, b, loose)
+    when '<='
+      lte(a, b, loose)
+    else
+      raise 'Invalid operator: ' + op
+    end
+  end
+
   def self.outside(version, range, hilo, loose = false)
     version = Version.new(version, loose)
     range = Range.new(range, loose)

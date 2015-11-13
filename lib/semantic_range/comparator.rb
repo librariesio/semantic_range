@@ -39,7 +39,7 @@ module SemanticRange
     def test(version)
       return true if @semver == ANY
       version = Version.new(version, @loose) if version.is_a?(String)
-      cmp(version, @operator, @semver, @loose)
+      SemanticRange.cmp(version, @operator, @semver, @loose)
     end
 
     def parse(comp)
@@ -53,33 +53,6 @@ module SemanticRange
         @semver = ANY
       else
         @semver = Version.new(m[2], @loose)
-      end
-    end
-
-    def cmp(a, op, b, loose)
-      case op
-      when '==='
-        a = a.version if !a.is_a?(String)
-        b = b.version if !b.is_a?(String)
-        a == b
-      when '!=='
-        a = a.version if !a.is_a?(String)
-        b = b.version if !b.is_a?(String)
-        a != b
-      when '', '=', '=='
-        SemanticRange.eq(a, b, loose)
-      when '!='
-        SemanticRange.neq(a, b, loose)
-      when '>'
-        SemanticRange.gt(a, b, loose)
-      when '>='
-        SemanticRange.gte(a, b, loose)
-      when '<'
-        SemanticRange.lt(a, b, loose)
-      when '<='
-        SemanticRange.lte(a, b, loose)
-      else
-        raise 'Invalid operator: ' + op
       end
     end
   end
