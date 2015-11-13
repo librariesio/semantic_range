@@ -78,7 +78,7 @@ module SemanticRange
       range = range.split(/\s+/).join(' ')
 
       set = range.split(' ').map do |comp|
-        parseComparator(comp, @loose)
+        parse_comparator(comp, @loose)
       end.join(' ').split(/\s+/)
 
       set = set.select{|comp| !!comp.match(COMPARATORLOOSE) } if @loose
@@ -90,7 +90,7 @@ module SemanticRange
       !id || id.downcase == 'x' || id == '*'
     end
 
-    def parseComparator(comp, loose)
+    def parse_comparator(comp, loose)
       comp = replace_carets(comp, loose)
       comp = replace_tildes(comp, loose)
       comp = replace_x_ranges(comp, loose)
