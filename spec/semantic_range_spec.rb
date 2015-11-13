@@ -389,7 +389,7 @@ describe SemanticRange do
       pre = tuple[0]
       wanted = tuple[1]
       loose = tuple[2]
-      expect(SemanticRange.valid(pre, loose)).to eq(wanted)
+      expect(SemanticRange.valid_range(pre, loose)).to eq(wanted)
     end
   end
 
