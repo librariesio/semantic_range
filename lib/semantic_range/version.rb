@@ -78,12 +78,18 @@ module SemanticRange
       compare_identifiers(@major, other.major) | compare_identifiers(@minor, other.minor) | compare_identifiers(@patch, other.patch)
     end
 
+    def truthy(val)
+      val.zero? ? false : true
+    end
+
     def compare_pre(other)
       other = Version.new(other, @loose) unless other.is_a?(Version)
 
-      return -1 if !@prerelease.nil? && other.prerelease.nil?
-      return 1 if @prerelease.nil? && !other.prerelease.nil?
-      return 0 if @prerelease.nil? && other.prerelease.nil?
+      return -1 if truthy(@prerelease.length) && !truthy(other.prerelease.length)
+
+      return 1 if !truthy(@prerelease.length) && truthy(other.prerelease.length)
+
+      return 0 if !truthy(@prerelease.length) && !truthy(other.prerelease.length)
 
       i = 0
       while true
@@ -97,10 +103,11 @@ module SemanticRange
         elsif a.nil?
           return -1
         elsif a == b
-          i += 1
+
         else
-          return compareIdentifiers(a, b)
+          return compare_identifiers(a, b)
         end
+        i += 1
       end
     end
 
