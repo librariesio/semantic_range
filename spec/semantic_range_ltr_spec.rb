@@ -108,8 +108,8 @@ describe SemanticRange do
     expect(SemanticRange.ltr('v0.1.97', '>=0.1.97', false)).to eq(false)
     expect(SemanticRange.ltr('0.1.97', '>=0.1.97', false)).to eq(false)
     expect(SemanticRange.ltr('1.2.4', '0.1.20 || 1.2.4', false)).to eq(false)
-    #expect(SemanticRange.ltr('1.2.4', '0.1.20 || >1.2.4', false)).to eq(false)
-    #expect(SemanticRange.ltr('1.2.3', '0.1.20 || 1.2.4', false)).to eq(false)
+    expect(SemanticRange.ltr('1.2.4', '0.1.20 || >1.2.4', false)).to eq(false)
+    expect(SemanticRange.ltr('1.2.3', '0.1.20 || 1.2.4', false)).to eq(false)
     expect(SemanticRange.ltr('0.1.20', '0.1.20 || 1.2.4', false)).to eq(false)
     expect(SemanticRange.ltr('0.0.0', '>=0.2.3 || <0.0.1', false)).to eq(false)
     expect(SemanticRange.ltr('0.2.3', '>=0.2.3 || <0.0.1', false)).to eq(false)
@@ -160,6 +160,6 @@ describe SemanticRange do
     expect(SemanticRange.ltr('1.0.0beta', '~1.0.0-alpha', true)).to eq(false)
     expect(SemanticRange.ltr('1.0.0-beta', '^1.0.0-alpha', false)).to eq(false)
     expect(SemanticRange.ltr('1.0.0-beta', '~1.0.0-alpha', false)).to eq(false)
-    #expect(SemanticRange.ltr('1.0.0', '=0.1.0', false)).to eq(false)
+    expect(SemanticRange.ltr('1.0.0', '=0.1.0', false)).to eq(false)
   end
 end

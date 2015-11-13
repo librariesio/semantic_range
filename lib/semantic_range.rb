@@ -126,15 +126,15 @@ module SemanticRange
 
       case hilo
       when '>'
-        if (!low.operator || low.operator == comp) && lte(version, low.semver, loose)
+        if (low.operator.empty? || low.operator == comp) && lte(version, low.semver, loose)
           return false;
         elsif (low.operator == ecomp && lt(version, low.semver, loose))
           return false;
         end
       when '<'
-        if (!low.operator || low.operator == comp) && gte(version, low.semver, loose)
+        if (low.operator.empty? || low.operator == comp) && gte(version, low.semver, loose)
           return false;
-        elsif (low.operator == ecomp && gt(version, low.semver, loose))
+        elsif low.operator == ecomp && gt(version, low.semver, loose)
           return false;
         end
       end
