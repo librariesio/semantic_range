@@ -217,6 +217,8 @@ module SemanticRange
 
     return nil unless version.is_a?(String)
 
+    version.strip!
+
     return nil if version.length > MAX_LENGTH
 
     rxp = loose ? LOOSE : FULL
