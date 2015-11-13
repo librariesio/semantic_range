@@ -6,6 +6,7 @@ module SemanticRange
       @raw = range
       @loose = loose
       split = range.split(/\s*\|\|\s*/)
+      split = ['', ''] if range == '||'
       split = [''] if split == []
       @set = split.map do |range|
         parse_range(range.strip)
