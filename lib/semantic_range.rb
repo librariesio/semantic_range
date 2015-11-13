@@ -103,8 +103,8 @@ module SemanticRange
           comparator = Comparator.new('>=0.0.0', loose)
         end
 
-        high = comparator
-        low = comparator
+        high = high || comparator
+        low = low || comparator
 
         case hilo
         when '>'
@@ -126,15 +126,15 @@ module SemanticRange
 
       case hilo
       when '>'
-        if (!low.operator || low.operator == comp) && lte(version, low.semver)
+        if (!low.operator || low.operator == comp) && lte(version, low.semver, loose)
           return false;
-        elsif (low.operator == ecomp && lt(version, low.semver))
+        elsif (low.operator == ecomp && lt(version, low.semver, loose))
           return false;
         end
       when '<'
-        if (!low.operator || low.operator == comp) && gte(version, low.semver)
+        if (!low.operator || low.operator == comp) && gte(version, low.semver, loose)
           return false;
-        elsif (low.operator == ecomp && gt(version, low.semver))
+        elsif (low.operator == ecomp && gt(version, low.semver, loose))
           return false;
         end
       end
