@@ -105,7 +105,7 @@ describe SemanticRange do
     expect(SemanticRange.ltr('1.9999.9999', '<= 2.0.0', false)).to eq(false)
     expect(SemanticRange.ltr('0.2.9', '<=  2.0.0', false)).to eq(false)
     expect(SemanticRange.ltr('1.9999.9999', '<    2.0.0', false)).to eq(false)
-    expect(SemanticRange.ltr('0.2.9', '<\t2.0.0', false)).to eq(false)
+    expect(SemanticRange.ltr('0.2.9', "<\t2.0.0", false)).to eq(false)
     expect(SemanticRange.ltr('v0.1.97', '>=0.1.97', false)).to eq(false)
     expect(SemanticRange.ltr('0.1.97', '>=0.1.97', false)).to eq(false)
     expect(SemanticRange.ltr('1.2.4', '0.1.20 || 1.2.4', false)).to eq(false)
