@@ -127,15 +127,12 @@ module SemanticRange
           end
           if mj == '0'
             if m == '0'
-              ret = '>=' + mj + '.' + m + '.' + p + pr +
-                    ' <' + mj + '.' + m + '.' + (p.to_i + 1);
+              ret = ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{m}.#{(p.to_i + 1)}"
             else
-              ret = '>=' + mj + '.' + m + '.' + p + pr +
-                    ' <' + mj + '.' + (m.to_i + 1) + '.0'
+              ret = ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{(m.to_i + 1)}.0"
             end
           else
-            ret = '>=' + mj + '.' + m + '.' + p + pr +
-                  ' <' + (mj.to_i + 1) + '.0.0'
+            ret = ">=#{mj}.#{m}.#{p}#{pr} <#{(mj.to_i + 1)}.0.0"
           end
         else
           if mj == '0'
@@ -169,13 +166,12 @@ module SemanticRange
         if isX(mj)
           ret = ''
         elsif isX(m)
-          ret = '>=' + mj + '.0.0 <' + (mj.to_i + 1) + '.0.0'
+          ret = ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
         elsif isX(p)
-          ret = '>=' + mj + '.' + m + '.0 <' + mj + '.' + (m.to_i + 1) + '.0'
+          ret = ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
         elsif pr
           pr = '-' + pr if (pr[0] != '-')
-          ret = '>=' + mj + '.' + m + '.' + p + pr +
-                ' <' + mj + '.' + (m.to_i + 1) + '.0'
+          ret = ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{(m.to_i + 1)}.0"
         else
           ret = ">=#{mj}.#{m}.#{p} < #{mj}.#{(m.to_i + 1)}.0"
         end
@@ -238,9 +234,9 @@ module SemanticRange
 
           ret = "#{gtlt}#{mj}.#{m}.#{p}"
         elsif xm
-          ret = '>=' + mj + '.0.0 <' + (mj.to_i + 1) + '.0.0'
+          ret = ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
         elsif xp
-          ret = '>=' + mj + '.' + m + '.0 <' + mj + '.' + (m.to_i + 1) + '.0'
+          ret = ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
         end
 
         ret
@@ -268,23 +264,23 @@ module SemanticRange
       if isX(fM)
         from = ''
       elsif isX(fm)
-        from = '>=' + fM + '.0.0'
+        from = ">=#{fM}.0.0"
       elsif isX(fp)
-        from = '>=' + fM + '.' + fm + '.0'
+        from = ">=#{fM}.#{fm}.0"
       else
-        from = '>=' + from
+        from = ">=#{from}"
       end
 
       if isX(tM)
         to = ''
       elsif isX(tm)
-        to = '<' + (+tM + 1) + '.0.0'
+        to = "<#{(tM.to_i + 1)}.0.0"
       elsif isX(tp)
-        to = '<' + tM + '.' + (+tm + 1) + '.0'
+        to = "<#{tm}.#{(tm.to_i + 1)}.0"
       elsif tpr
-        to = '<=' + tM + '.' + tm + '.' + tp + '-' + tpr
+        to = "<=#{tM}.#{tm}.#{tp}-#{tpr}"
       else
-        to = '<=' + to
+        to "<=#{to}"
       end
 
       "#{from} #{to}".strip
