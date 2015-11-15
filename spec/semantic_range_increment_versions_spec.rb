@@ -96,7 +96,7 @@ describe SemanticRange do
         expect(parsed.version).to eq(wanted), "increment(*#{input}) object version updated"
         expect(parsed.raw).to eq(wanted), "increment(*#{input}) object raw field updated"
       elsif parsed
-        expect(SemanticRange.parse(what, id)).to raise_error
+        expect { SemanticRange.parse(what, id) }.to raise_error
       else
         expect(parsed).to eq(nil)
       end
