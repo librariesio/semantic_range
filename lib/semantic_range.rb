@@ -232,4 +232,8 @@ module SemanticRange
       nil
     end
   end
+
+  def self.increment(pre, what, loose, id)
+    # TODO
+  end
 end
