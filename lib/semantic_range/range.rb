@@ -12,7 +12,7 @@ module SemanticRange
       split = [''] if split == []
       @set = split.map {|range| parse_range(range.strip) }
 
-      raise 'Invalid SemVer Range: ' + range if @set.empty?
+      raise 'Invalid SemVer Range: ' + range if @set.empty? || @set == [[]]
 
       format
     end

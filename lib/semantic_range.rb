@@ -144,6 +144,7 @@ module SemanticRange
   end
 
   def self.satisfies(version, range, loose = false)
+    return false if !valid_range(range, loose)
     Range.new(range, loose).test(version)
   end
 

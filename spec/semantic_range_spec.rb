@@ -229,7 +229,7 @@ describe SemanticRange do
       range = tuple[0]
       version = tuple[1]
       loose = tuple[2]
-      expect(SemanticRange.satisfies(version, range, loose)).to eq(true)
+      expect(SemanticRange.satisfies(version, range, loose)).to eq(true), "#{tuple}"
     end
   end
 
@@ -307,7 +307,7 @@ describe SemanticRange do
       range = tuple[0]
       version = tuple[1]
       loose = tuple[2]
-      expect(SemanticRange.satisfies(version, range, loose)).to eq(false)
+      expect(SemanticRange.satisfies(version, range, loose)).to eq(false), "#{tuple}"
     end
   end
 
