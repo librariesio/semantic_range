@@ -237,4 +237,15 @@ module SemanticRange
   def self.increment(pre, what, loose, id)
     # TODO
   end
+
+  def self.diff(a, b)
+    a = Version.new(a, false) unless a.kind_of?(Version)
+    b = Version.new(b, false) unless b.kind_of?(Version)
+    pre_diff = a.prerelease.to_s != b.prerelease.to_s
+    pre = pre_diff ? 'pre' : ''
+    return "#{pre}major" if a.major != b.major
+    return "#{pre}minor" if a.minor != b.minor
+    return "#{pre}patch" if a.patch != b.patch
+    return "prerelease"  if pre_diff
+  end
 end
