@@ -451,4 +451,22 @@ describe SemanticRange do
     expect(SemanticRange.gte('2.2.4', '1.2.2', false)).to eq(true)
     expect(SemanticRange.gte('2.2.4', '2.1.2', false)).to eq(true)
   end
+
+  it 'diff versions' do
+    # [version1, version2, result]
+    # diff(version1, version2) -> result
+    expect(SemanticRange.diff('1.2.3', '0.2.3')).to eq('major')
+    expect(SemanticRange.diff(SemanticRange::Version.new('1.2.3', false), SemanticRange::Version.new('0.2.3', false))).to eq('major')
+    expect(SemanticRange.diff('1.4.5', '0.2.3')).to eq('major')
+    expect(SemanticRange.diff('1.2.3', '2.0.0-pre')).to eq('premajor')
+    expect(SemanticRange.diff('1.2.3', '1.3.3')).to eq('minor')
+    expect(SemanticRange.diff('1.0.1', '1.1.0-pre')).to eq('preminor')
+    expect(SemanticRange.diff('1.2.3', '1.2.4')).to eq('patch')
+    expect(SemanticRange.diff('1.2.3', '1.2.4-pre')).to eq('prepatch')
+    expect(SemanticRange.diff('0.0.1', '0.0.1-pre')).to eq('prerelease')
+    expect(SemanticRange.diff('0.0.1', '0.0.1-pre-2')).to eq('prerelease')
+    expect(SemanticRange.diff('1.1.0', '1.1.0-pre')).to eq('prerelease')
+    expect(SemanticRange.diff('1.1.0-pre-1', '1.1.0-pre-2')).to eq('prerelease')
+    expect(SemanticRange.diff('1.0.0', '1.0.0')).to eq(nil)
+  end
 end
