@@ -1,4 +1,5 @@
 require "semantic_range/version"
+require "semantic_range/pre_release"
 require "semantic_range/range"
 require "semantic_range/comparator"
 
