@@ -1,7 +1,65 @@
 module SemanticRange
   VERSION = "0.1.1"
 
+  class PreRelease
+    attr_reader :input
+
+    def initialize(input)
+      @input = input.to_s
+    end
+
+    def length
+      parts.length
+    end
+
+    def to_s
+      parts.join '.'
+    end
+
+    def parts
+      input.split('.').map do |id|
+        if /^[0-9]+$/.match(id)
+          num = id.to_i
+          # TODO error handling
+        else
+          id
+        end
+      end
+    end
+
+    def <=>(other)
+      return unless other.is_a?(self.class)
+
+      return -1 if parts.any? && !other.parts.any?
+
+      return 1 if !parts.any? && other.parts.any?
+
+      return 0 if !parts.any? && !other.parts.any?
+
+      i = 0
+      while true
+        a = parts[i]
+        b = other.parts[i]
+
+        if a.nil? && b.nil?
+          return 0
+        elsif b.nil?
+          return 1
+        elsif a.nil?
+          return -1
+        elsif a == b
+
+        else
+          return Version.compare_identifiers(a, b)
+        end
+        i += 1
+      end
+    end
+  end
+
   class Version
+    attr_accessor :prerelease
+
     def initialize(version, loose)
       @raw = version
       @loose = loose
@@ -17,20 +75,7 @@ module SemanticRange
       @minor = match[2] ? match[2].to_i : 0
       @patch = match[3] ? match[3].to_i : 0
 
-      # TODO error handling
-
-      if !match[4]
-        @prerelease = []
-      else
-        @prerelease = match[4].split('.').map do |id|
-          if /^[0-9]+$/.match(id)
-            num = id.to_i
-            # TODO error handling
-          else
-            id
-          end
-        end
-      end
+      @prerelease = PreRelease.new match[4]
 
       @build = match[5] ? match[5].split('.') : []
       @version = format
@@ -56,14 +101,10 @@ module SemanticRange
       @patch
     end
 
-    def prerelease
-      @prerelease
-    end
-
     def format
       v = "#{@major}.#{@minor}.#{@patch}"
-      if @prerelease.length > 0
-        v += '-' + @prerelease.join('.')
+      if prerelease.length > 0
+        v += '-' + prerelease.to_s
       end
       v
     end
@@ -80,7 +121,7 @@ module SemanticRange
 
     def compare_main(other)
       other = Version.new(other, @loose) unless other.is_a?(Version)
-      truthy(compare_identifiers(@major, other.major)) || truthy(compare_identifiers(@minor, other.minor)) || truthy(compare_identifiers(@patch, other.patch))
+      truthy(self.class.compare_identifiers(@major, other.major)) || truthy(self.class.compare_identifiers(@minor, other.minor)) || truthy(self.class.compare_identifiers(@patch, other.patch))
     end
 
     def truthy(val)
@@ -89,35 +130,10 @@ module SemanticRange
     end
 
     def compare_pre(other)
-      other = Version.new(other, @loose) unless other.is_a?(Version)
-
-      return -1 if truthy(@prerelease.length) && !truthy(other.prerelease.length)
-
-      return 1 if !truthy(@prerelease.length) && truthy(other.prerelease.length)
-
-      return 0 if !truthy(@prerelease.length) && !truthy(other.prerelease.length)
-
-      i = 0
-      while true
-        a = @prerelease[i]
-        b = other.prerelease[i]
-
-        if a.nil? && b.nil?
-          return 0
-        elsif b.nil?
-          return 1
-        elsif a.nil?
-          return -1
-        elsif a == b
-
-        else
-          return compare_identifiers(a, b)
-        end
-        i += 1
-      end
+      prerelease <=> other.prerelease
     end
 
-    def compare_identifiers(a,b)
+    def self.compare_identifiers(a,b)
       anum = /^[0-9]+$/.match(a.to_s)
       bnum = /^[0-9]+$/.match(b.to_s)
 
