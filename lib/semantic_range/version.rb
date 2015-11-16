@@ -8,11 +8,9 @@ module SemanticRange
       @raw = version
       @loose = loose
 
-      if version.is_a?(Version)
-        @raw = version = version.raw
-      end
+      @raw = version.raw if version.is_a?(Version)
 
-      match = version.strip.match(loose ? LOOSE : FULL)
+      match = @raw.strip.match(loose ? LOOSE : FULL)
       # TODO error handling
 
       @major = match[1] ? match[1].to_i : 0
@@ -27,10 +25,7 @@ module SemanticRange
 
     def format
       v = "#{@major}.#{@minor}.#{@patch}"
-      if prerelease.length > 0
-        v += '-' + prerelease.to_s
-      end
-      v
+      prerelease.length > 0 ? "#{v}-#{prerelease}" : v
     end
 
     def to_s
@@ -45,7 +40,9 @@ module SemanticRange
 
     def compare_main(other)
       other = Version.new(other, @loose) unless other.is_a?(Version)
-      truthy(self.class.compare_identifiers(@major, other.major)) || truthy(self.class.compare_identifiers(@minor, other.minor)) || truthy(self.class.compare_identifiers(@patch, other.patch))
+      truthy(self.class.compare_identifiers(@major, other.major)) ||
+      truthy(self.class.compare_identifiers(@minor, other.minor)) ||
+      truthy(self.class.compare_identifiers(@patch, other.patch))
     end
 
     def truthy(val)
