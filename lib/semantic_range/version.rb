@@ -4,7 +4,7 @@ module SemanticRange
   class Version
     attr_reader :version, :raw, :major, :minor, :patch, :prerelease
 
-    def initialize(version, loose)
+    def initialize(version, loose = false)
       @raw = version
       @loose = loose
 

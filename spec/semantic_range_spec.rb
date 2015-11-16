@@ -60,7 +60,7 @@ describe SemanticRange do
     ].each do |tuple|
       v0 = tuple[0]
       v1 = tuple[1]
-      loose = tuple[2] || false
+      loose = tuple[2]
       expect(SemanticRange.gt(v0, v1, loose)).to eq(true)
       expect(SemanticRange.lt(v1, v0, loose)).to eq(true)
       expect(SemanticRange.lt(v0, v1, loose)).to eq(false)
@@ -117,7 +117,7 @@ describe SemanticRange do
     ].each do |tuple|
       v0 = tuple[0]
       v1 = tuple[1]
-      loose = tuple[2] || false
+      loose = tuple[2]
       expect(SemanticRange.eq(v0, v1, loose)).to eq(true)
       expect(SemanticRange.neq(v0, v1, loose)).to eq(false)
       expect(SemanticRange.cmp(v0, '==', v1, loose)).to eq(true)
@@ -228,7 +228,7 @@ describe SemanticRange do
     ].each do |tuple|
       range = tuple[0]
       version = tuple[1]
-      loose = tuple[2] || false
+      loose = tuple[2]
       expect(SemanticRange.satisfies(version, range, loose)).to eq(true)
     end
   end
@@ -306,7 +306,7 @@ describe SemanticRange do
     ].each do |tuple|
       range = tuple[0]
       version = tuple[1]
-      loose = tuple[2] || false
+      loose = tuple[2]
       expect(SemanticRange.satisfies(version, range, loose)).to eq(false)
     end
   end
@@ -404,52 +404,52 @@ describe SemanticRange do
   end
 
   it 'gt' do
-    expect(SemanticRange.gt('1.2.4', '1.3.0', false)).to eq(false)
-    expect(SemanticRange.gt('1.2.4', '1.2.5', false)).to eq(false)
-    expect(SemanticRange.gt('1.2.4', '2.2.5', false)).to eq(false)
+    expect(SemanticRange.gt('1.2.4', '1.3.0')).to eq(false)
+    expect(SemanticRange.gt('1.2.4', '1.2.5')).to eq(false)
+    expect(SemanticRange.gt('1.2.4', '2.2.5')).to eq(false)
 
-    expect(SemanticRange.gt('2.2.4', '2.2.2', false)).to eq(true)
-    expect(SemanticRange.gt('2.2.4', '1.2.2', false)).to eq(true)
-    expect(SemanticRange.gt('2.2.4', '2.1.2', false)).to eq(true)
+    expect(SemanticRange.gt('2.2.4', '2.2.2')).to eq(true)
+    expect(SemanticRange.gt('2.2.4', '1.2.2')).to eq(true)
+    expect(SemanticRange.gt('2.2.4', '2.1.2')).to eq(true)
 
-    expect(SemanticRange.gt('1.4.0', '1.4.0', false)).to eq(false)
-    expect(SemanticRange.gt('1.4.0', SemanticRange::Version.new('1.4.0', false), false)).to eq(false)
-    expect(SemanticRange.gt(SemanticRange::Version.new('1.4.0', false), '1.4.0', false)).to eq(false)
-    expect(SemanticRange.gt(SemanticRange::Version.new('1.4.0', false), SemanticRange::Version.new('1.4.0', false), false)).to eq(false)
+    expect(SemanticRange.gt('1.4.0', '1.4.0')).to eq(false)
+    expect(SemanticRange.gt('1.4.0', SemanticRange::Version.new('1.4.0'))).to eq(false)
+    expect(SemanticRange.gt(SemanticRange::Version.new('1.4.0'), '1.4.0')).to eq(false)
+    expect(SemanticRange.gt(SemanticRange::Version.new('1.4.0'), SemanticRange::Version.new('1.4.0'))).to eq(false)
   end
 
   it 'eq' do
-    expect(SemanticRange.eq('1.2.4', '1.1.0', false)).to eq(false)
-    expect(SemanticRange.eq('1.2.4', '1.2.4', false)).to eq(true)
-    expect(SemanticRange.eq('1.2.4', '2.2.5', false)).to eq(false)
+    expect(SemanticRange.eq('1.2.4', '1.1.0')).to eq(false)
+    expect(SemanticRange.eq('1.2.4', '1.2.4')).to eq(true)
+    expect(SemanticRange.eq('1.2.4', '2.2.5')).to eq(false)
   end
 
   it 'neq' do
-    expect(SemanticRange.neq('1.2.4', '1.1.0', false)).to eq(true)
-    expect(SemanticRange.neq('1.2.4', '1.2.4', false)).to eq(false)
-    expect(SemanticRange.neq('1.2.4', '2.2.5', false)).to eq(true)
+    expect(SemanticRange.neq('1.2.4', '1.1.0')).to eq(true)
+    expect(SemanticRange.neq('1.2.4', '1.2.4')).to eq(false)
+    expect(SemanticRange.neq('1.2.4', '2.2.5')).to eq(true)
   end
 
   it 'lte' do
-    expect(SemanticRange.lte('1.2.4', '1.3.0', false)).to eq(true)
-    expect(SemanticRange.lte('1.2.4', '1.2.5', false)).to eq(true)
-    expect(SemanticRange.lte('1.2.4', '2.2.5', false)).to eq(true)
-    expect(SemanticRange.lte('1.2.4', '1.2.4', false)).to eq(true)
+    expect(SemanticRange.lte('1.2.4', '1.3.0')).to eq(true)
+    expect(SemanticRange.lte('1.2.4', '1.2.5')).to eq(true)
+    expect(SemanticRange.lte('1.2.4', '2.2.5')).to eq(true)
+    expect(SemanticRange.lte('1.2.4', '1.2.4')).to eq(true)
 
-    expect(SemanticRange.lte('2.2.4', '2.2.2', false)).to eq(false)
-    expect(SemanticRange.lte('2.2.4', '1.2.2', false)).to eq(false)
-    expect(SemanticRange.lte('2.2.4', '2.1.2', false)).to eq(false)
+    expect(SemanticRange.lte('2.2.4', '2.2.2')).to eq(false)
+    expect(SemanticRange.lte('2.2.4', '1.2.2')).to eq(false)
+    expect(SemanticRange.lte('2.2.4', '2.1.2')).to eq(false)
   end
 
   it 'gte' do
-    expect(SemanticRange.gte('1.2.4', '1.3.0', false)).to eq(false)
-    expect(SemanticRange.gte('1.2.4', '1.2.5', false)).to eq(false)
-    expect(SemanticRange.gte('1.2.4', '2.2.5', false)).to eq(false)
+    expect(SemanticRange.gte('1.2.4', '1.3.0')).to eq(false)
+    expect(SemanticRange.gte('1.2.4', '1.2.5')).to eq(false)
+    expect(SemanticRange.gte('1.2.4', '2.2.5')).to eq(false)
 
-    expect(SemanticRange.lte('1.2.4', '1.2.4', false)).to eq(true)
-    expect(SemanticRange.gte('2.2.4', '2.2.2', false)).to eq(true)
-    expect(SemanticRange.gte('2.2.4', '1.2.2', false)).to eq(true)
-    expect(SemanticRange.gte('2.2.4', '2.1.2', false)).to eq(true)
+    expect(SemanticRange.lte('1.2.4', '1.2.4')).to eq(true)
+    expect(SemanticRange.gte('2.2.4', '2.2.2')).to eq(true)
+    expect(SemanticRange.gte('2.2.4', '1.2.2')).to eq(true)
+    expect(SemanticRange.gte('2.2.4', '2.1.2')).to eq(true)
   end
 
   it 'diff versions' do
