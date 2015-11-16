@@ -2,13 +2,12 @@ module SemanticRange
   class Comparator
     attr_reader :semver, :operator, :value
     def initialize(comp, loose)
-      @loose = loose
-
       if comp.is_a?(Comparator)
         return comp if comp.loose == loose
         @comp = comp.value
       end
 
+      @loose = loose
       parse(comp)
 
       @value = @semver == ANY ? '' : @operator + @semver.version

@@ -29,9 +29,7 @@ module SemanticRange
       return unless other.is_a?(self.class)
 
       return -1 if parts.any? && !other.parts.any?
-
       return 1 if !parts.any? && other.parts.any?
-
       return 0 if !parts.any? && !other.parts.any?
 
       i = 0
