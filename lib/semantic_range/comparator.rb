@@ -1,5 +1,6 @@
 module SemanticRange
   class Comparator
+    attr_reader :semver, :operator, :value
     def initialize(comp, loose)
       @loose = loose
 
@@ -20,19 +21,7 @@ module SemanticRange
       end
     end
 
-    def semver
-      @semver
-    end
-
-    def operator
-      @operator
-    end
-
     def to_s
-      @value
-    end
-
-    def value
       @value
     end
 

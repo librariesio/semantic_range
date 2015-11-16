@@ -2,7 +2,7 @@ module SemanticRange
   VERSION = "0.1.1"
 
   class Version
-    attr_accessor :prerelease
+    attr_reader :version, :raw, :major, :minor, :patch, :prerelease
 
     def initialize(version, loose)
       @raw = version
@@ -23,26 +23,6 @@ module SemanticRange
 
       @build = match[5] ? match[5].split('.') : []
       @version = format
-    end
-
-    def version
-      @version
-    end
-
-    def raw
-      @raw
-    end
-
-    def major
-      @major
-    end
-
-    def minor
-      @minor
-    end
-
-    def patch
-      @patch
     end
 
     def format

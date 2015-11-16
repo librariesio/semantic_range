@@ -1,5 +1,7 @@
 module SemanticRange
   class Range
+    attr_reader :loose, :raw, :range, :set
+
     def initialize(range, loose)
       range = range.raw if range.is_a?(Range)
 
@@ -17,27 +19,11 @@ module SemanticRange
       format
     end
 
-    def loose
-      @loose
-    end
-
-    def raw
-      @raw
-    end
-
-    def range
-      @range
-    end
-
     def format
       @range = @set.map do |comps|
         comps.join(' ').strip
       end.join('||').strip
       @range
-    end
-
-    def set
-      @set
     end
 
     def test(version)
