@@ -5,20 +5,13 @@ module SemanticRange
       @loose = loose
 
       if comp.is_a?(Comparator)
-        if comp.loose == loose
-          return comp
-        else
-          @comp = comp.value
-        end
+        return comp if comp.loose == loose
+        @comp = comp.value
       end
 
       parse(comp)
 
-      if @semver == ANY
-        @value = ''
-      else
-        @value = @operator + @semver.version
-      end
+      @value = @semver == ANY ? '' : @operator + @semver.version
     end
 
     def to_s
@@ -33,16 +26,12 @@ module SemanticRange
 
     def parse(comp)
       m = comp.match(@loose ? COMPARATORLOOSE : COMPARATOR)
-      raise 'Invalid comparator: ' + comp unless m
+      raise "Invalid comparator: #{comp}" unless m
 
       @operator = m[1]
       @operator = '' if @operator == '='
 
-      if !m[2]
-        @semver = ANY
-      else
-        @semver = Version.new(m[2], @loose)
-      end
+      @semver = !m[2] ? ANY : Version.new(m[2], @loose)
     end
   end
 end
