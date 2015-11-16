@@ -10,9 +10,7 @@ module SemanticRange
       split = range.split(/\s*\|\|\s*/)
       split = ['', ''] if range == '||'
       split = [''] if split == []
-      @set = split.map do |range|
-        parse_range(range.strip)
-      end
+      @set = split.map {|range| parse_range(range.strip) }
 
       raise 'Invalid SemVer Range: ' + range if @set.empty?
 
@@ -29,16 +27,11 @@ module SemanticRange
     def test(version)
       return false if !version
       version = Version.new(version, @loose) if version.is_a?(String)
-      @set.each do |s|
-        return true if test_set(s, version)
-      end
-      false
+      @set.any?{|s| test_set(s, version) }
     end
 
     def test_set(set, version)
-      set.each do |comp|
-        return false if !comp.test(version)
-      end
+      return false if set.any? {|comp| !comp.test(version) }
       if version.prerelease.length > 0
         set.each do |comp|
           next if comp.semver == ANY
@@ -105,14 +98,14 @@ module SemanticRange
         pr = match[4]
 
         if isX(mj)
-          ret = ''
+          ''
         elsif isX(m)
-          ret = ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
+          ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
         elsif isX(p)
           if mj == '0'
-            ret = ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
+            ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
           else
-            ret = ">=#{mj}.#{m}.0 <#{(mj.to_i + 1)}.0.0"
+            ">=#{mj}.#{m}.0 <#{(mj.to_i + 1)}.0.0"
           end
         elsif pr
           if pr[0] != '-'
@@ -120,25 +113,24 @@ module SemanticRange
           end
           if mj == '0'
             if m == '0'
-              ret = ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{m}.#{(p.to_i + 1)}"
+              ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{m}.#{(p.to_i + 1)}"
             else
-              ret = ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{(m.to_i + 1)}.0"
+              ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{(m.to_i + 1)}.0"
             end
           else
-            ret = ">=#{mj}.#{m}.#{p}#{pr} <#{(mj.to_i + 1)}.0.0"
+            ">=#{mj}.#{m}.#{p}#{pr} <#{(mj.to_i + 1)}.0.0"
           end
         else
           if mj == '0'
             if m == '0'
-              ret = ">=#{mj}.#{m}.#{p} <#{mj}.#{m}.#{(p.to_i + 1)}"
+              ">=#{mj}.#{m}.#{p} <#{mj}.#{m}.#{(p.to_i + 1)}"
             else
-              ret = ">=#{mj}.#{m}.#{p} <#{mj}.#{(m.to_i + 1)}.0"
+              ">=#{mj}.#{m}.#{p} <#{mj}.#{(m.to_i + 1)}.0"
             end
           else
-            ret = ">=#{mj}.#{m}.#{p} <#{(mj.to_i + 1)}.0.0"
+            ">=#{mj}.#{m}.#{p} <#{(mj.to_i + 1)}.0.0"
           end
         end
-        ret
       end
     end
 
@@ -157,18 +149,17 @@ module SemanticRange
         pr = match[4]
 
         if isX(mj)
-          ret = ''
+          ''
         elsif isX(m)
-          ret = ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
+          ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
         elsif isX(p)
-          ret = ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
+          ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
         elsif pr
           pr = '-' + pr if (pr[0] != '-')
-          ret = ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{(m.to_i + 1)}.0"
+          ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{(m.to_i + 1)}.0"
         else
-          ret = ">=#{mj}.#{m}.#{p} <#{mj}.#{(m.to_i + 1)}.0"
+          ">=#{mj}.#{m}.#{p} <#{mj}.#{(m.to_i + 1)}.0"
         end
-        ret
       end
     end
 
@@ -198,9 +189,9 @@ module SemanticRange
 
         if xM
           if gtlt == '>' || gtlt == '<'
-            ret = '<0.0.0'
+            '<0.0.0'
           else
-            ret = '*'
+            '*'
           end
         elsif !gtlt.nil? && gtlt != '' && anyX
           m = 0 if xm
@@ -225,14 +216,14 @@ module SemanticRange
             end
           end
 
-          ret = "#{gtlt}#{mj}.#{m}.#{p}"
+          "#{gtlt}#{mj}.#{m}.#{p}"
         elsif xm
-          ret = ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
+          ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
         elsif xp
-          ret = ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
+          ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
+        else
+          ret
         end
-
-        ret
       end
     end
 
