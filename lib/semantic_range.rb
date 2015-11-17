@@ -153,8 +153,12 @@ module SemanticRange
     Range.new(range, loose).test(version)
   end
 
-  def self.max_satisfying(version, range, loose = false)
-    # TODO
+  def self.max_satisfying(versions, range, loose = false)
+    versions.select { |version|
+      satisfies(version, range, loose)
+    }.sort { |a, b|
+      rcompare(a, b, loose)
+    }[0] || nil
   end
 
   def self.valid_range(range, loose = false)
