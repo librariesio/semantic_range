@@ -265,4 +265,10 @@ module SemanticRange
     return "#{pre}patch" if a.patch != b.patch
     return "prerelease"  if pre_diff
   end
+
+  def self.to_comparators(range, loose = false)
+    Range.new(range, loose).set.map do |comp|
+      comp.map(&:to_s)
+    end
+  end
 end
