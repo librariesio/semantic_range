@@ -1,28 +1,37 @@
 module SemanticRange
   class PreRelease
-    attr_reader :input
+    attr_reader :parts
 
     def initialize(input)
-      @input = input.to_s
+      @parts = parse(input)
+    end
+
+    def parse(str)
+      str.to_s.split('.').map { |id| convert(id) }
+    end
+
+    def convert(str)
+      str.match(/^[0-9]+$/) ? str.to_i : str
     end
 
     def length
       parts.length
     end
 
+    def empty?
+      parts.empty?
+    end
+
     def to_s
       parts.join '.'
     end
 
-    def parts
-      input.split('.').map do |id|
-        if /^[0-9]+$/.match(id)
-          num = id.to_i
-          # TODO error handling
-        else
-          id
-        end
-      end
+    def clear!
+      @parts = []
+    end
+
+    def zero!
+      @parts = [0]
     end
 
     def <=>(other)
