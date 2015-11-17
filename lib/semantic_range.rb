@@ -45,6 +45,9 @@ module SemanticRange
 
   MAX_LENGTH = 256
 
+  class InvalidIncrement < StandardError; end
+  class NoMatchFound < StandardError; end
+
   def self.ltr(version, range, loose = false)
     outside(version, range, '<', loose)
   end
@@ -235,8 +238,15 @@ module SemanticRange
     end
   end
 
-  def self.increment(pre, what, loose, id)
-    # TODO
+  def self.increment!(version, release, loose, identifier)
+    if loose.is_a? String
+      identifier = loose
+      loose = false
+    end
+
+    Version.new(version, loose).increment!(release, identifier).version
+  rescue InvalidIncrement, NoMatchFound
+    nil
   end
 
   def self.diff(a, b)
