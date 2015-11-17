@@ -469,4 +469,17 @@ describe SemanticRange do
     expect(SemanticRange.diff('1.1.0-pre-1', '1.1.0-pre-2')).to eq('prerelease')
     expect(SemanticRange.diff('1.0.0', '1.0.0')).to eq(nil)
   end
+
+  it 'invalid version numbers' do
+    [
+      '1.2.3.4',
+      'NOT VALID',
+      1.2,
+      nil,
+      'Infinity.NaN.Infinity'
+    ].each do |v|
+      expect { SemanticRange::Version.new(v) }
+        .to raise_error(SemanticRange::InvalidVersion)
+    end
+  end
 end
