@@ -47,6 +47,8 @@ module SemanticRange
 
   class InvalidIncrement < StandardError; end
   class InvalidVersion < StandardError; end
+  class InvalidComparator < StandardError; end
+  class InvalidRange < StandardError; end
 
   def self.ltr(version, range, loose = false)
     outside(version, range, '<', loose)
