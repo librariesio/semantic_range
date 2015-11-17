@@ -2,7 +2,7 @@ module SemanticRange
   class Range
     attr_reader :loose, :raw, :range, :set
 
-    def initialize(range, loose)
+    def initialize(range, loose = false)
       range = range.raw if range.is_a?(Range)
 
       @raw = range
@@ -10,9 +10,14 @@ module SemanticRange
       split = range.split(/\s*\|\|\s*/)
       split = ['', ''] if range == '||'
       split = [''] if split == []
-      @set = split.map {|range| parse_range(range.strip) }
 
-      raise 'Invalid SemVer Range: ' + range if @set.empty? || @set == [[]]
+      begin
+        @set = split.map {|range| parse_range(range.strip) }
+      rescue InvalidComparator
+        @set = []
+      end
+
+      raise InvalidRange.new(range) if @set.empty? || @set == [[]]
 
       format
     end

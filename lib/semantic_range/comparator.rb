@@ -25,7 +25,7 @@ module SemanticRange
 
     def parse(comp)
       m = comp.match(@loose ? COMPARATORLOOSE : COMPARATOR)
-      raise "Invalid comparator: #{comp}" unless m
+      raise InvalidComparator.new(comp) unless m
 
       @operator = m[1]
       @operator = '' if @operator == '='

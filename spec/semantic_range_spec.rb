@@ -500,4 +500,15 @@ describe SemanticRange do
       expect { SemanticRange::Version.new(strict).compare(loose) }.to raise_error(SemanticRange::InvalidVersion)
     end
   end
+
+  it 'strict vs loose ranges' do
+    [
+      ['>=01.02.03', '>=1.2.3'],
+      ['~1.02.03beta', '>=1.2.3-beta <1.3.0']
+    ].each do |v|
+      loose, comps = v
+      expect { SemanticRange::Range.new(loose) }.to raise_error(SemanticRange::InvalidRange)
+      expect(SemanticRange::Range.new(loose, true).range).to eq(comps)
+    end
+  end
 end
