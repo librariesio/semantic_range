@@ -265,7 +265,7 @@ module SemanticRange
       elsif isX(tm)
         to = "<#{(tM.to_i + 1)}.0.0"
       elsif isX(tp)
-        to = "<#{tm}.#{(tm.to_i + 1)}.0"
+        to = "<#{tM}.#{(tm.to_i + 1)}.0"
       elsif tpr
         to = "<=#{tM}.#{tm}.#{tp}-#{tpr}"
       else
