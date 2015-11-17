@@ -46,7 +46,7 @@ module SemanticRange
   MAX_LENGTH = 256
 
   class InvalidIncrement < StandardError; end
-  class NoMatchFound < StandardError; end
+  class InvalidVersion < StandardError; end
 
   def self.ltr(version, range, loose = false)
     outside(version, range, '<', loose)
@@ -245,7 +245,7 @@ module SemanticRange
     end
 
     Version.new(version, loose).increment!(release, identifier).version
-  rescue InvalidIncrement, NoMatchFound
+  rescue InvalidIncrement, InvalidVersion
     nil
   end
 

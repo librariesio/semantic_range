@@ -10,9 +10,9 @@ module SemanticRange
 
       @raw = version.raw if version.is_a?(Version)
 
-      match = @raw.strip.match(loose ? LOOSE : FULL)
+      match = @raw.to_s.strip.match(loose ? LOOSE : FULL)
 
-      raise NoMatchFound.new(version) if match.nil?
+      raise InvalidVersion.new(version) if match.nil?
 
       @major = match[1] ? match[1].to_i : 0
       @minor = match[2] ? match[2].to_i : 0
