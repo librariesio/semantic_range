@@ -482,4 +482,22 @@ describe SemanticRange do
         .to raise_error(SemanticRange::InvalidVersion)
     end
   end
+
+  it 'strict vs loose version numbers' do
+    [
+      ['=1.2.3', '1.2.3'],
+      ['01.02.03', '1.2.3'],
+      ['1.2.3-beta.01', '1.2.3-beta.1'],
+      ['   =1.2.3', '1.2.3'],
+      ['1.2.3foo', '1.2.3-foo']
+    ].each do |v|
+      loose, strict = v
+      expect { SemanticRange::Version.new(loose) }.to raise_error(SemanticRange::InvalidVersion)
+      lv = SemanticRange::Version.new(loose, true)
+      expect(lv.version).to eq(strict)
+      expect(SemanticRange.eq(loose, strict, true)).to eq(true)
+      expect { SemanticRange.eq(loose, strict) }.to raise_error(SemanticRange::InvalidVersion)
+      expect { SemanticRange::Version.new(strict).compare(loose) }.to raise_error(SemanticRange::InvalidVersion)
+    end
+  end
 end
