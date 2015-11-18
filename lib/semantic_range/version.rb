@@ -144,35 +144,7 @@ module SemanticRange
         # This probably shouldn't be used publicly.
         # 1.0.0 "pre" would become 1.0.0-0 which is the wrong direction.
       when 'pre'
-        if @prerelease.empty?
-          @prerelease.zero!
-        else
-          parts = @prerelease.parts
-          i = parts.length
-          while i >= 0
-            if parts[i].is_a?(Fixnum)
-              parts[i] += 1
-              i = -2
-            else
-              i = i-1
-            end
-          end
-          if i == -1 # didn't increment anything
-            parts << 0
-          end
-          @prerelease = PreRelease.new(parts.join("."))
-        end
-        if identifier
-          # 1.2.0-beta.1 bumps to 1.2.0-beta.2,
-          # 1.2.0-beta.fooblz or 1.2.0-beta bumps to 1.2.0-beta.0
-          if @prerelease.parts[0] == identifier
-            unless @prerelease.parts[1].kind_of?(Fixnum)
-              @prerelease = PreRelease.new([identifier, 0].join('.'))
-            end
-          else
-            @prerelease = PreRelease.new([identifier, 0].join('.'))
-          end
-        end
+        @prerelease.increment!(identifier)
       else
         raise InvalidIncrement.new release
       end
