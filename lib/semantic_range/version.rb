@@ -14,6 +14,10 @@ module SemanticRange
 
       raise InvalidVersion.new(version) if match.nil?
 
+      if String(version.to_s).length > MAX_LENGTH
+        raise InvalidVersion.new("#{version} is too long")
+      end
+
       @major = match[1] ? match[1].to_i : 0
       @minor = match[2] ? match[2].to_i : 0
       @patch = match[3] ? match[3].to_i : 0

@@ -604,4 +604,17 @@ describe SemanticRange do
       expect(found).to eq(wanted), "to_comparators(#{pre}), expected #{found} to eq #{jw}"
     end
   end
+
+  it 'long version is too long' do
+    v = "1.2.#{'1' * 256}"
+    expect { SemanticRange::Version.new(v) }.to raise_error(SemanticRange::InvalidVersion, "#{v} is too long")
+    expect(SemanticRange.valid(v, false)).to eq(nil)
+    expect(SemanticRange.valid(v, true)).to eq(nil)
+    expect(SemanticRange.increment!(v, 'patch', nil, nil)).to eq(nil)
+  end
+
+  it 'parsing nil does not raise expection' do
+    expect(SemanticRange.parse(nil)).to eq(nil)
+    expect(SemanticRange.parse({})).to eq(nil)
+  end
 end
