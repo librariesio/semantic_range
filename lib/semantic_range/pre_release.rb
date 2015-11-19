@@ -60,5 +60,33 @@ module SemanticRange
         i += 1
       end
     end
+
+    def last_number_index
+      parts.rindex { |e| e.is_a? Fixnum }
+    end
+
+    def increment!(identifier = nil)
+      if empty?
+        zero!
+      else
+        if last_number_index
+          @parts[last_number_index] += 1
+        else
+          @parts << 0
+        end
+      end
+
+      if identifier
+        # 1.2.0-beta.1 bumps to 1.2.0-beta.2,
+        # 1.2.0-beta.fooblz or 1.2.0-beta bumps to 1.2.0-beta.0
+        if parts[0] == identifier
+          unless parts[1].kind_of?(Fixnum)
+            @parts = [identifier, 0]
+          end
+        else
+          @parts = [identifier, 0]
+        end
+      end
+    end
   end
 end
