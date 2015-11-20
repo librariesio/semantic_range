@@ -237,11 +237,7 @@ module SemanticRange
     rxp = loose ? LOOSE : FULL
     return nil if !rxp.match(version)
 
-    begin
-      Version.new(version, loose)
-    rescue
-      nil
-    end
+    Version.new(version, loose)
   end
 
   def self.increment!(version, release, loose, identifier)
