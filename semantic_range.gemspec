@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Andrew Nesbitt"]
   spec.email         = ["andrewnez@gmail.com"]
 
-  spec.summary       = %q{node-semver rewritten in ruby, for comparison and inclusion of semantic versions and rangee}
+  spec.summary       = %q{node-semver rewritten in ruby, for comparison and inclusion of semantic versions and ranges}
   spec.homepage      = "https://libraries.io/github/librariesio/semantic_range"
   spec.license       = "MIT"
 
