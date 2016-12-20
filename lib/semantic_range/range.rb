@@ -1,10 +1,10 @@
 module SemanticRange
   class Range
-    attr_reader :loose, :raw, :range, :set
+    attr_reader :loose, :raw, :range, :set, :platform
 
-    def initialize(range, loose = false)
+    def initialize(range, loose = false, platform = nil)
       range = range.raw if range.is_a?(Range)
-
+      @platform = platform
       @raw = range
       @loose = loose
       split = range.split(/\s*\|\|\s*/)
@@ -158,7 +158,12 @@ module SemanticRange
         elsif isX(m)
           ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
         elsif isX(p)
-          ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
+          if ['Rubygems', 'Packagist'].include?(platform)
+            ">=#{mj}.#{m}.0 <#{mj.to_i+1}.0.0"
+          else
+            ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
+          end
+
         elsif pr
           pr = '-' + pr if (pr[0] != '-')
           ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{(m.to_i + 1)}.0"

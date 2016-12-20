@@ -50,12 +50,12 @@ module SemanticRange
   class InvalidComparator < StandardError; end
   class InvalidRange < StandardError; end
 
-  def self.ltr(version, range, loose = false)
-    outside(version, range, '<', loose)
+  def self.ltr(version, range, loose = false, platform = nil)
+    outside(version, range, '<', loose, platform)
   end
 
-  def self.gtr(version, range, loose = false)
-    outside(version, range, '>', loose)
+  def self.gtr(version, range, loose = false, platform = nil)
+    outside(version, range, '>', loose, platform)
   end
 
   def self.cmp(a, op, b, loose = false)
@@ -85,11 +85,11 @@ module SemanticRange
     end
   end
 
-  def self.outside(version, range, hilo, loose = false)
+  def self.outside(version, range, hilo, loose = false, platform = nil)
     version = Version.new(version, loose)
-    range = Range.new(range, loose)
+    range = Range.new(range, loose, platform)
 
-    return false if satisfies(version, range, loose)
+    return false if satisfies(version, range, loose, platform)
 
     case hilo
     when '>'
@@ -148,22 +148,22 @@ module SemanticRange
     true
   end
 
-  def self.satisfies(version, range, loose = false)
-    return false if !valid_range(range, loose)
-    Range.new(range, loose).test(version)
+  def self.satisfies(version, range, loose = false, platform = nil)
+    return false if !valid_range(range, loose, platform)
+    Range.new(range, loose, platform).test(version)
   end
 
-  def self.max_satisfying(versions, range, loose = false)
+  def self.max_satisfying(versions, range, loose = false, platform = nil)
     versions.select { |version|
-      satisfies(version, range, loose)
+      satisfies(version, range, loose, platform)
     }.sort { |a, b|
       rcompare(a, b, loose)
     }[0] || nil
   end
 
-  def self.valid_range(range, loose = false)
+  def self.valid_range(range, loose = false, platform = nil)
     begin
-      r = Range.new(range, loose).range
+      r = Range.new(range, loose, platform).range
       r = '*' if r.nil? || r.empty?
       r
     rescue
@@ -262,8 +262,8 @@ module SemanticRange
     return "prerelease"  if pre_diff
   end
 
-  def self.to_comparators(range, loose = false)
-    Range.new(range, loose).set.map do |comp|
+  def self.to_comparators(range, loose = false, platform = nil)
+    Range.new(range, loose, platform).set.map do |comp|
       comp.map(&:to_s)
     end
   end
