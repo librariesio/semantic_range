@@ -2,12 +2,9 @@ module SemanticRange
   class Comparator
     attr_reader :semver, :operator, :value
     def initialize(comp, loose)
-      if comp.is_a?(Comparator)
-        return comp if comp.loose == loose
-        @comp = comp.value
-      end
-
+      comp = comp.value if comp.is_a?(Comparator)
       @loose = loose
+
       parse(comp)
 
       @value = @semver == ANY ? '' : @operator + @semver.version
@@ -31,6 +28,40 @@ module SemanticRange
       @operator = '' if @operator == '='
 
       @semver = !m[2] ? ANY : Version.new(m[2], @loose)
+    end
+
+    def intersects(comp, loose = false, platform = nil)
+      comp = Comparator.new(comp, loose)
+
+      if @operator == ''
+        range_b = Range.new(comp.value, loose, platform)
+        SemanticRange.satisfies(@value, range_b, loose, platform)
+      elsif comp.operator == ''
+        range_a = Range.new(@value, loose, platform)
+        SemanticRange.satisfies(comp.semver, range_a, loose, platform)
+      else
+        same_direction_increasing      = (@operator == '>=' || @operator == '>') && (comp.operator == '>=' || comp.operator == '>')
+        same_direction_decreasing      = (@operator == '<=' || @operator == '<') && (comp.operator == '<=' || comp.operator == '<')
+        same_version                   = @semver.raw == comp.semver.raw
+        different_directions_inclusive = (@operator == '>=' || @operator == '<=') && (comp.operator == '>=' || comp.operator == '<=')
+        opposite_directions_lte        = SemanticRange.cmp(@semver, '<', comp.semver, loose) &&
+            ((@operator == '>=' || @operator == '>') && (comp.operator == '<=' || comp.operator == '<'))
+        opposite_directions_gte        = SemanticRange.cmp(@semver, '>', comp.semver, loose) &&
+            ((@operator == '<=' || @operator == '<') && (comp.operator == '>=' || comp.operator == '>'))
+
+        same_direction_increasing || same_direction_decreasing || (same_version && different_directions_inclusive) ||
+            opposite_directions_lte || opposite_directions_gte
+      end
+    end
+
+    def satisfies_range(range, loose = false, platform = nil)
+      range = Range.new(range, loose, platform)
+
+      range.set.any? do |comparators|
+        comparators.all? do |comparator|
+          intersects(comparator, loose, platform)
+        end
+      end
     end
   end
 end

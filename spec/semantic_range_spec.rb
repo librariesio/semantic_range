@@ -617,4 +617,72 @@ describe SemanticRange do
     expect(SemanticRange.parse(nil)).to eq(nil)
     expect(SemanticRange.parse({})).to eq(nil)
   end
+
+  it 'intersect comparators' do
+    [
+        # One is a Version
+        ['1.3.0', '>=1.3.0', true],
+        ['1.3.0', '>1.3.0', false],
+        ['>=1.3.0', '1.3.0', true],
+        ['>1.3.0', '1.3.0', false],
+        # Same direction increasing
+        ['>1.3.0', '>1.2.0', true],
+        ['>1.2.0', '>1.3.0', true],
+        ['>=1.2.0', '>1.3.0', true],
+        ['>1.2.0', '>=1.3.0', true],
+        # Same direction decreasing
+        ['<1.3.0', '<1.2.0', true],
+        ['<1.2.0', '<1.3.0', true],
+        ['<=1.2.0', '<1.3.0', true],
+        ['<1.2.0', '<=1.3.0', true],
+        # Different directions, same semver and inclusive operator
+        ['>=1.3.0', '<=1.3.0', true],
+        ['>=1.3.0', '>=1.3.0', true],
+        ['<=1.3.0', '<=1.3.0', true],
+        ['>1.3.0', '<=1.3.0', false],
+        ['>=1.3.0', '<1.3.0', false],
+        # Opposite matching directions
+        ['>1.0.0', '<2.0.0', true],
+        ['>=1.0.0', '<2.0.0', true],
+        ['>=1.0.0', '<=2.0.0', true],
+        ['>1.0.0', '<=2.0.0', true],
+        ['<=2.0.0', '>1.0.0', true],
+        ['<=1.0.0', '>=2.0.0', false]
+    ].each do |c|
+      comp_1 = SemanticRange::Comparator.new(c[0], nil)
+      comp_2 = SemanticRange::Comparator.new(c[1], nil)
+      expect(comp_1.intersects(comp_2)).to eq(c[2])
+      expect(comp_2.intersects(comp_1)).to eq(c[2])
+    end
+  end
+
+  it 'comparator satisfies range' do
+    [
+        ['1.3.0', '1.3.0 || <1.0.0 >2.0.0', true],
+        ['1.3.0', '<1.0.0 >2.0.0', false],
+        ['>=1.3.0', '<1.3.0', false],
+        ['<1.3.0', '>=1.3.0', false]
+    ].each do |c|
+      comp = SemanticRange::Comparator.new(c[0], nil)
+      range = SemanticRange::Range.new(c[1])
+      expect(comp.satisfies_range(range)).to eq(c[2])
+    end
+  end
+
+  it 'ranges intersect' do
+    [
+        ['1.3.0 || <1.0.0 >2.0.0', '1.3.0 || <1.0.0 >2.0.0', true],
+        ['<1.0.0 >2.0.0', '>0.0.0', true],
+        ['<1.0.0 >2.0.0', '>1.4.0 <1.6.0', false],
+        ['<1.0.0 >2.0.0', '>1.4.0 <1.6.0 || 2.0.0', false],
+        ['>1.0.0 <=2.0.0', '2.0.0', true],
+        ['<1.0.0 >=2.0.0', '2.1.0', false],
+        ['<1.0.0 >=2.0.0', '>1.4.0 <1.6.0 || 2.0.0', false]
+    ].each do |c|
+      range_1 = SemanticRange::Range.new(c[0])
+      range_2 = SemanticRange::Range.new(c[1])
+      expect(range_1.intersects(range_2)).to eq(c[2])
+      expect(range_2.intersects(range_1)).to eq(c[2])
+    end
+  end
 end

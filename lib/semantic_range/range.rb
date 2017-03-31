@@ -279,5 +279,15 @@ module SemanticRange
 
       "#{from} #{to}".strip
     end
+
+    def intersects(range, loose = false, platform = nil)
+      range = Range.new(range, loose, platform)
+
+      @set.any? do |comparators|
+        comparators.all? do |comparator|
+          comparator.satisfies_range(range, loose, platform)
+        end
+      end
+    end
   end
 end
