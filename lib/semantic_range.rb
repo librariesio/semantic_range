@@ -270,7 +270,15 @@ module SemanticRange
 
   class << self
     # Support for older non-inquisitive method versions
+    alias_method :gt, :gt?
+    alias_method :gtr, :gtr?
+    alias_method :gte, :gte?
+    alias_method :lt, :lt?
     alias_method :ltr, :ltr?
-
+    alias_method :lte, :lte?
+    alias_method :eq, :eq?
+    alias_method :neq, :neq?
+    alias_method :outside, :outside?
+    alias_method :satisfies, :satisfies?
   end
 end
