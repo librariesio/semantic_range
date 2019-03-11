@@ -35,10 +35,10 @@ module SemanticRange
 
       if @operator == ''
         range_b = Range.new(comp.value, loose, platform)
-        SemanticRange.satisfies(@value, range_b, loose, platform)
+        SemanticRange.satisfies?(@value, range_b, loose, platform)
       elsif comp.operator == ''
         range_a = Range.new(@value, loose, platform)
-        SemanticRange.satisfies(comp.semver, range_a, loose, platform)
+        SemanticRange.satisfies?(comp.semver, range_a, loose, platform)
       else
         same_direction_increasing      = (@operator == '>=' || @operator == '>') && (comp.operator == '>=' || comp.operator == '>')
         same_direction_decreasing      = (@operator == '<=' || @operator == '<') && (comp.operator == '<=' || comp.operator == '<')

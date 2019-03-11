@@ -103,8 +103,8 @@ describe SemanticRange do
       range = tuple[0]
       version = tuple[1]
       loose = tuple[2]
-      expect(SemanticRange.satisfies(version, range, loose, 'Rubygems')).to eq(true), "#{tuple}"
-      expect(SemanticRange.satisfies(version, range, loose, 'Packagist')).to eq(true), "#{tuple}"
+      expect(SemanticRange.satisfies?(version, range, loose, 'Rubygems')).to eq(true), "#{tuple}"
+      expect(SemanticRange.satisfies?(version, range, loose, 'Packagist')).to eq(true), "#{tuple}"
     end
   end
 
@@ -182,8 +182,8 @@ describe SemanticRange do
       range = tuple[0]
       version = tuple[1]
       loose = tuple[2]
-      expect(SemanticRange.satisfies(version, range, loose, 'Rubygems')).to eq(false), "#{tuple}"
-      expect(SemanticRange.satisfies(version, range, loose, 'Packagist')).to eq(false), "#{tuple}"
+      expect(SemanticRange.satisfies?(version, range, loose, 'Rubygems')).to eq(false), "#{tuple}"
+      expect(SemanticRange.satisfies?(version, range, loose, 'Packagist')).to eq(false), "#{tuple}"
     end
   end
 

@@ -50,12 +50,12 @@ module SemanticRange
   class InvalidComparator < StandardError; end
   class InvalidRange < StandardError; end
 
-  def self.ltr(version, range, loose = false, platform = nil)
-    outside(version, range, '<', loose, platform)
+  def self.ltr?(version, range, loose = false, platform = nil)
+    outside?(version, range, '<', loose, platform)
   end
 
-  def self.gtr(version, range, loose = false, platform = nil)
-    outside(version, range, '>', loose, platform)
+  def self.gtr?(version, range, loose = false, platform = nil)
+    outside?(version, range, '>', loose, platform)
   end
 
   def self.cmp(a, op, b, loose = false)
@@ -69,27 +69,27 @@ module SemanticRange
       b = b.version if !b.is_a?(String)
       a != b
     when '', '=', '=='
-      eq(a, b, loose)
+      eq?(a, b, loose)
     when '!='
-      neq(a, b, loose)
+      neq?(a, b, loose)
     when '>'
-      gt(a, b, loose)
+      gt?(a, b, loose)
     when '>='
-      gte(a, b, loose)
+      gte?(a, b, loose)
     when '<'
-      lt(a, b, loose)
+      lt?(a, b, loose)
     when '<='
-      lte(a, b, loose)
+      lte?(a, b, loose)
     else
       raise 'Invalid operator: ' + op
     end
   end
 
-  def self.outside(version, range, hilo, loose = false, platform = nil)
+  def self.outside?(version, range, hilo, loose = false, platform = nil)
     version = Version.new(version, loose)
     range = Range.new(range, loose, platform)
 
-    return false if satisfies(version, range, loose, platform)
+    return false if satisfies?(version, range, loose, platform)
 
     case hilo
     when '>'
@@ -114,15 +114,15 @@ module SemanticRange
 
         case hilo
         when '>'
-          if gt(comparator.semver, high.semver, loose)
+          if gt?(comparator.semver, high.semver, loose)
             high = comparator
-          elsif lt(comparator.semver, low.semver, loose)
+          elsif lt?(comparator.semver, low.semver, loose)
             low = comparator
           end
         when '<'
-          if lt(comparator.semver, high.semver, loose)
+          if lt?(comparator.semver, high.semver, loose)
             high = comparator
-          elsif gt(comparator.semver, low.semver, loose)
+          elsif gt?(comparator.semver, low.semver, loose)
             low = comparator
           end
         end
@@ -132,15 +132,15 @@ module SemanticRange
 
       case hilo
       when '>'
-        if (low.operator.empty? || low.operator == comp) && lte(version, low.semver, loose)
+        if (low.operator.empty? || low.operator == comp) && lte?(version, low.semver, loose)
           return false;
-        elsif (low.operator == ecomp && lt(version, low.semver, loose))
+        elsif (low.operator == ecomp && lt?(version, low.semver, loose))
           return false;
         end
       when '<'
-        if (low.operator.empty? || low.operator == comp) && gte(version, low.semver, loose)
+        if (low.operator.empty? || low.operator == comp) && gte?(version, low.semver, loose)
           return false;
-        elsif low.operator == ecomp && gt(version, low.semver, loose)
+        elsif low.operator == ecomp && gt?(version, low.semver, loose)
           return false;
         end
       end
@@ -148,14 +148,14 @@ module SemanticRange
     true
   end
 
-  def self.satisfies(version, range, loose = false, platform = nil)
+  def self.satisfies?(version, range, loose = false, platform = nil)
     return false if !valid_range(range, loose, platform)
     Range.new(range, loose, platform).test(version)
   end
 
   def self.max_satisfying(versions, range, loose = false, platform = nil)
     versions.select { |version|
-      satisfies(version, range, loose, platform)
+      satisfies?(version, range, loose, platform)
     }.sort { |a, b|
       rcompare(a, b, loose)
     }[0] || nil
@@ -191,31 +191,31 @@ module SemanticRange
     # TODO
   end
 
-  def self.lt(a, b, loose = false)
+  def self.lt?(a, b, loose = false)
     compare(a, b, loose) < 0
   end
 
-  def self.gt(a, b, loose = false)
+  def self.gt?(a, b, loose = false)
     compare(a, b, loose) > 0
   end
 
-  def self.eq(a, b, loose = false)
+  def self.eq?(a, b, loose = false)
     compare(a, b, loose) == 0
   end
 
-  def self.neq(a, b, loose = false)
+  def self.neq?(a, b, loose = false)
     compare(a, b, loose) != 0
   end
 
-  def self.gte(a, b, loose = false)
+  def self.gte?(a, b, loose = false)
     compare(a, b, loose) >= 0
   end
 
-  def self.lte(a, b, loose = false)
+  def self.lte?(a, b, loose = false)
     compare(a, b, loose) <= 0
   end
 
-  def self.valid(version, loose = false)
+  def self.valid?(version, loose = false)
     v = parse(version, loose)
     return v ? v.version : nil
   end
@@ -266,5 +266,11 @@ module SemanticRange
     Range.new(range, loose, platform).set.map do |comp|
       comp.map(&:to_s)
     end
+  end
+
+  class << self
+    # Support for older non-inquisitive method versions
+    alias_method :ltr, :ltr?
+
   end
 end
