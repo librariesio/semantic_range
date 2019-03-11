@@ -608,8 +608,8 @@ describe SemanticRange do
   it 'long version is too long' do
     v = "1.2.#{'1' * 256}"
     expect { SemanticRange::Version.new(v) }.to raise_error(SemanticRange::InvalidVersion, "#{v} is too long")
-    expect(SemanticRange.valid?(v, false)).to eq(nil)
-    expect(SemanticRange.valid?(v, true)).to eq(nil)
+    expect(SemanticRange.valid(v, false)).to eq(nil)
+    expect(SemanticRange.valid(v, true)).to eq(nil)
     expect(SemanticRange.increment!(v, 'patch', nil, nil)).to eq(nil)
   end
 
@@ -697,6 +697,5 @@ describe SemanticRange do
     expect(SemanticRange.method(:neq)).to eq(SemanticRange.method(:neq?))
     expect(SemanticRange.method(:outside)).to eq(SemanticRange.method(:outside?))
     expect(SemanticRange.method(:satisfies)).to eq(SemanticRange.method(:satisfies?))
-    expect(SemanticRange.method(:valid)).to eq(SemanticRange.method(:valid?))
   end
 end

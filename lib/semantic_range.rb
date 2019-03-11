@@ -215,7 +215,7 @@ module SemanticRange
     compare(a, b, loose) <= 0
   end
 
-  def self.valid?(version, loose = false)
+  def self.valid(version, loose = false)
     v = parse(version, loose)
     return v ? v.version : nil
   end
