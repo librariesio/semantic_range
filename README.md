@@ -24,9 +24,9 @@ Or install it yourself as:
 SemanticRange.valid('1.2.3') # '1.2.3'
 SemanticRange.valid('a.b.c') # nil
 SemanticRange.clean('  =v1.2.3   ') # '1.2.3'
-SemanticRange.satisfies('1.2.3', '1.x || >=2.5.0 || 5.0.0 - 7.2.3') # true
-SemanticRange.gt('1.2.3', '9.8.7') # false
-SemanticRange.lt('1.2.3', '9.8.7') # true
+SemanticRange.satisfies?('1.2.3', '1.x || >=2.5.0 || 5.0.0 - 7.2.3') # true
+SemanticRange.gt?('1.2.3', '9.8.7') # false
+SemanticRange.lt?('1.2.3', '9.8.7') # true
 ```
 
 ## Development

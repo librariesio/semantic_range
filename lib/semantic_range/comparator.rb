@@ -30,15 +30,15 @@ module SemanticRange
       @semver = !m[2] ? ANY : Version.new(m[2], @loose)
     end
 
-    def intersects(comp, loose = false, platform = nil)
+    def intersects?(comp, loose = false, platform = nil)
       comp = Comparator.new(comp, loose)
 
       if @operator == ''
         range_b = Range.new(comp.value, loose, platform)
-        SemanticRange.satisfies(@value, range_b, loose, platform)
+        SemanticRange.satisfies?(@value, range_b, loose, platform)
       elsif comp.operator == ''
         range_a = Range.new(@value, loose, platform)
-        SemanticRange.satisfies(comp.semver, range_a, loose, platform)
+        SemanticRange.satisfies?(comp.semver, range_a, loose, platform)
       else
         same_direction_increasing      = (@operator == '>=' || @operator == '>') && (comp.operator == '>=' || comp.operator == '>')
         same_direction_decreasing      = (@operator == '<=' || @operator == '<') && (comp.operator == '<=' || comp.operator == '<')
@@ -54,14 +54,18 @@ module SemanticRange
       end
     end
 
-    def satisfies_range(range, loose = false, platform = nil)
+    def satisfies_range?(range, loose = false, platform = nil)
       range = Range.new(range, loose, platform)
 
       range.set.any? do |comparators|
         comparators.all? do |comparator|
-          intersects(comparator, loose, platform)
+          intersects?(comparator, loose, platform)
         end
       end
     end
+
+    # Support for older non-inquisitive method versions
+    alias_method :intersects, :intersects?
+    alias_method :satisfies_range, :satisfies_range?
   end
 end

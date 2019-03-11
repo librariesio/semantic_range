@@ -61,6 +61,20 @@ describe SemanticRange do
       v0 = tuple[0]
       v1 = tuple[1]
       loose = tuple[2]
+
+      expect(SemanticRange.gt?(v0, v1, loose)).to eq(true)
+      expect(SemanticRange.lt?(v1, v0, loose)).to eq(true)
+      expect(SemanticRange.lt?(v0, v1, loose)).to eq(false)
+      expect(SemanticRange.gt?(v1, v0, loose)).to eq(false)
+      expect(SemanticRange.eq?(v0, v0, loose)).to eq(true)
+      expect(SemanticRange.eq?(v1, v1, loose)).to eq(true)
+      expect(SemanticRange.neq?(v0, v1, loose)).to eq(true)
+      expect(SemanticRange.cmp(v1, '==', v1, loose)).to eq(true)
+      expect(SemanticRange.cmp(v0, '>=', v1, loose)).to eq(true)
+      expect(SemanticRange.cmp(v1, '<=', v0, loose)).to eq(true)
+      expect(SemanticRange.cmp(v0, '!=', v1, loose)).to eq(true)
+
+      # Backwards-compatibility
       expect(SemanticRange.gt(v0, v1, loose)).to eq(true)
       expect(SemanticRange.lt(v1, v0, loose)).to eq(true)
       expect(SemanticRange.lt(v0, v1, loose)).to eq(false)
@@ -68,10 +82,6 @@ describe SemanticRange do
       expect(SemanticRange.eq(v0, v0, loose)).to eq(true)
       expect(SemanticRange.eq(v1, v1, loose)).to eq(true)
       expect(SemanticRange.neq(v0, v1, loose)).to eq(true)
-      expect(SemanticRange.cmp(v1, '==', v1, loose)).to eq(true)
-      expect(SemanticRange.cmp(v0, '>=', v1, loose)).to eq(true)
-      expect(SemanticRange.cmp(v1, '<=', v0, loose)).to eq(true)
-      expect(SemanticRange.cmp(v0, '!=', v1, loose)).to eq(true)
     end
   end
 
@@ -118,12 +128,20 @@ describe SemanticRange do
       v0 = tuple[0]
       v1 = tuple[1]
       loose = tuple[2]
-      expect(SemanticRange.eq(v0, v1, loose)).to eq(true)
-      expect(SemanticRange.neq(v0, v1, loose)).to eq(false)
+      expect(SemanticRange.eq?(v0, v1, loose)).to eq(true)
+      expect(SemanticRange.neq?(v0, v1, loose)).to eq(false)
       expect(SemanticRange.cmp(v0, '==', v1, loose)).to eq(true)
       expect(SemanticRange.cmp(v0, '!=', v1, loose)).to eq(false)
       expect(SemanticRange.cmp(v0, '===', v1, loose)).to eq(false)
       expect(SemanticRange.cmp(v0, '!==', v1, loose)).to eq(true)
+      expect(SemanticRange.gt?(v0, v1, loose)).to eq(false)
+      expect(SemanticRange.gte?(v0, v1, loose)).to eq(true)
+      expect(SemanticRange.lt?(v0, v1, loose)).to eq(false)
+      expect(SemanticRange.lte?(v0, v1, loose)).to eq(true)
+
+      # Backwards-compatibility
+      expect(SemanticRange.eq(v0, v1, loose)).to eq(true)
+      expect(SemanticRange.neq(v0, v1, loose)).to eq(false)
       expect(SemanticRange.gt(v0, v1, loose)).to eq(false)
       expect(SemanticRange.gte(v0, v1, loose)).to eq(true)
       expect(SemanticRange.lt(v0, v1, loose)).to eq(false)
@@ -229,6 +247,9 @@ describe SemanticRange do
       range = tuple[0]
       version = tuple[1]
       loose = tuple[2]
+      expect(SemanticRange.satisfies?(version, range, loose)).to eq(true), "#{tuple}"
+
+      # Backwards-compatibility
       expect(SemanticRange.satisfies(version, range, loose)).to eq(true), "#{tuple}"
     end
   end
@@ -307,6 +328,9 @@ describe SemanticRange do
       range = tuple[0]
       version = tuple[1]
       loose = tuple[2]
+      expect(SemanticRange.satisfies?(version, range, loose)).to eq(false), "#{tuple}"
+
+      # Backwards-compatibility
       expect(SemanticRange.satisfies(version, range, loose)).to eq(false), "#{tuple}"
     end
   end
@@ -393,7 +417,16 @@ describe SemanticRange do
     end
   end
 
-  it 'lt' do
+  it 'lt?' do
+    expect(SemanticRange.lt?('1.2.4', '1.3.0', false)).to eq(true)
+    expect(SemanticRange.lt?('1.2.4', '1.2.5', false)).to eq(true)
+    expect(SemanticRange.lt?('1.2.4', '2.2.5', false)).to eq(true)
+
+    expect(SemanticRange.lt?('2.2.4', '2.2.2', false)).to eq(false)
+    expect(SemanticRange.lt?('2.2.4', '1.2.2', false)).to eq(false)
+    expect(SemanticRange.lt?('2.2.4', '2.1.2', false)).to eq(false)
+
+    # Backwards-compatibility
     expect(SemanticRange.lt('1.2.4', '1.3.0', false)).to eq(true)
     expect(SemanticRange.lt('1.2.4', '1.2.5', false)).to eq(true)
     expect(SemanticRange.lt('1.2.4', '2.2.5', false)).to eq(true)
@@ -403,7 +436,21 @@ describe SemanticRange do
     expect(SemanticRange.lt('2.2.4', '2.1.2', false)).to eq(false)
   end
 
-  it 'gt' do
+  it 'gt?' do
+    expect(SemanticRange.gt?('1.2.4', '1.3.0')).to eq(false)
+    expect(SemanticRange.gt?('1.2.4', '1.2.5')).to eq(false)
+    expect(SemanticRange.gt?('1.2.4', '2.2.5')).to eq(false)
+
+    expect(SemanticRange.gt?('2.2.4', '2.2.2')).to eq(true)
+    expect(SemanticRange.gt?('2.2.4', '1.2.2')).to eq(true)
+    expect(SemanticRange.gt?('2.2.4', '2.1.2')).to eq(true)
+
+    expect(SemanticRange.gt?('1.4.0', '1.4.0')).to eq(false)
+    expect(SemanticRange.gt?('1.4.0', SemanticRange::Version.new('1.4.0'))).to eq(false)
+    expect(SemanticRange.gt?(SemanticRange::Version.new('1.4.0'), '1.4.0')).to eq(false)
+    expect(SemanticRange.gt?(SemanticRange::Version.new('1.4.0'), SemanticRange::Version.new('1.4.0'))).to eq(false)
+
+    # Backwards-compatibility
     expect(SemanticRange.gt('1.2.4', '1.3.0')).to eq(false)
     expect(SemanticRange.gt('1.2.4', '1.2.5')).to eq(false)
     expect(SemanticRange.gt('1.2.4', '2.2.5')).to eq(false)
@@ -416,21 +463,41 @@ describe SemanticRange do
     expect(SemanticRange.gt('1.4.0', SemanticRange::Version.new('1.4.0'))).to eq(false)
     expect(SemanticRange.gt(SemanticRange::Version.new('1.4.0'), '1.4.0')).to eq(false)
     expect(SemanticRange.gt(SemanticRange::Version.new('1.4.0'), SemanticRange::Version.new('1.4.0'))).to eq(false)
-  end
+end
 
-  it 'eq' do
+  it 'eq?' do
+    expect(SemanticRange.eq?('1.2.4', '1.1.0')).to eq(false)
+    expect(SemanticRange.eq?('1.2.4', '1.2.4')).to eq(true)
+    expect(SemanticRange.eq?('1.2.4', '2.2.5')).to eq(false)
+
+    # Backwards-compatibility
     expect(SemanticRange.eq('1.2.4', '1.1.0')).to eq(false)
     expect(SemanticRange.eq('1.2.4', '1.2.4')).to eq(true)
     expect(SemanticRange.eq('1.2.4', '2.2.5')).to eq(false)
   end
 
-  it 'neq' do
+  it 'neq?' do
+    expect(SemanticRange.neq?('1.2.4', '1.1.0')).to eq(true)
+    expect(SemanticRange.neq?('1.2.4', '1.2.4')).to eq(false)
+    expect(SemanticRange.neq?('1.2.4', '2.2.5')).to eq(true)
+
+    # Backwards-compatibility
     expect(SemanticRange.neq('1.2.4', '1.1.0')).to eq(true)
     expect(SemanticRange.neq('1.2.4', '1.2.4')).to eq(false)
     expect(SemanticRange.neq('1.2.4', '2.2.5')).to eq(true)
   end
 
-  it 'lte' do
+  it 'lte?' do
+    expect(SemanticRange.lte?('1.2.4', '1.3.0')).to eq(true)
+    expect(SemanticRange.lte?('1.2.4', '1.2.5')).to eq(true)
+    expect(SemanticRange.lte?('1.2.4', '2.2.5')).to eq(true)
+    expect(SemanticRange.lte?('1.2.4', '1.2.4')).to eq(true)
+
+    expect(SemanticRange.lte?('2.2.4', '2.2.2')).to eq(false)
+    expect(SemanticRange.lte?('2.2.4', '1.2.2')).to eq(false)
+    expect(SemanticRange.lte?('2.2.4', '2.1.2')).to eq(false)
+
+    # Backwards-compatibility
     expect(SemanticRange.lte('1.2.4', '1.3.0')).to eq(true)
     expect(SemanticRange.lte('1.2.4', '1.2.5')).to eq(true)
     expect(SemanticRange.lte('1.2.4', '2.2.5')).to eq(true)
@@ -441,7 +508,17 @@ describe SemanticRange do
     expect(SemanticRange.lte('2.2.4', '2.1.2')).to eq(false)
   end
 
-  it 'gte' do
+  it 'gte?' do
+    expect(SemanticRange.gte?('1.2.4', '1.3.0')).to eq(false)
+    expect(SemanticRange.gte?('1.2.4', '1.2.5')).to eq(false)
+    expect(SemanticRange.gte?('1.2.4', '2.2.5')).to eq(false)
+
+    expect(SemanticRange.lte?('1.2.4', '1.2.4')).to eq(true)
+    expect(SemanticRange.gte?('2.2.4', '2.2.2')).to eq(true)
+    expect(SemanticRange.gte?('2.2.4', '1.2.2')).to eq(true)
+    expect(SemanticRange.gte?('2.2.4', '2.1.2')).to eq(true)
+
+    # Backwards-compatibility
     expect(SemanticRange.gte('1.2.4', '1.3.0')).to eq(false)
     expect(SemanticRange.gte('1.2.4', '1.2.5')).to eq(false)
     expect(SemanticRange.gte('1.2.4', '2.2.5')).to eq(false)
@@ -495,9 +572,13 @@ describe SemanticRange do
       expect { SemanticRange::Version.new(loose) }.to raise_error(SemanticRange::InvalidVersion)
       lv = SemanticRange::Version.new(loose, true)
       expect(lv.version).to eq(strict)
+      expect(SemanticRange.eq?(loose, strict, true)).to eq(true)
+      expect { SemanticRange.eq?(loose, strict) }.to raise_error(SemanticRange::InvalidVersion)
+      expect { SemanticRange::Version.new(strict).compare(loose) }.to raise_error(SemanticRange::InvalidVersion)
+
+      # Backwards-compatibility
       expect(SemanticRange.eq(loose, strict, true)).to eq(true)
       expect { SemanticRange.eq(loose, strict) }.to raise_error(SemanticRange::InvalidVersion)
-      expect { SemanticRange::Version.new(strict).compare(loose) }.to raise_error(SemanticRange::InvalidVersion)
     end
   end
 
@@ -653,6 +734,10 @@ describe SemanticRange do
       comp_2 = SemanticRange::Comparator.new(c[1], nil)
       expect(comp_1.intersects(comp_2)).to eq(c[2])
       expect(comp_2.intersects(comp_1)).to eq(c[2])
+
+      # Backwards-compatibility
+      expect(comp_1.intersects(comp_2)).to eq(c[2])
+      expect(comp_2.intersects(comp_1)).to eq(c[2])
     end
   end
 
@@ -665,6 +750,9 @@ describe SemanticRange do
     ].each do |c|
       comp = SemanticRange::Comparator.new(c[0], nil)
       range = SemanticRange::Range.new(c[1])
+      expect(comp.satisfies_range?(range)).to eq(c[2])
+
+      # Backwards-compatibility
       expect(comp.satisfies_range(range)).to eq(c[2])
     end
   end
@@ -684,5 +772,18 @@ describe SemanticRange do
       expect(range_1.intersects(range_2)).to eq(c[2])
       expect(range_2.intersects(range_1)).to eq(c[2])
     end
+  end
+
+  it 'has backwards-compatible aliases for inquisitive methods' do
+    expect(SemanticRange.method(:gt)).to eq(SemanticRange.method(:gt?))
+    expect(SemanticRange.method(:gtr)).to eq(SemanticRange.method(:gtr?))
+    expect(SemanticRange.method(:gte)).to eq(SemanticRange.method(:gte?))
+    expect(SemanticRange.method(:lt)).to eq(SemanticRange.method(:lt?))
+    expect(SemanticRange.method(:ltr)).to eq(SemanticRange.method(:ltr?))
+    expect(SemanticRange.method(:lte)).to eq(SemanticRange.method(:lte?))
+    expect(SemanticRange.method(:eq)).to eq(SemanticRange.method(:eq?))
+    expect(SemanticRange.method(:neq)).to eq(SemanticRange.method(:neq?))
+    expect(SemanticRange.method(:outside)).to eq(SemanticRange.method(:outside?))
+    expect(SemanticRange.method(:satisfies)).to eq(SemanticRange.method(:satisfies?))
   end
 end
