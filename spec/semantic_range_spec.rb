@@ -734,6 +734,10 @@ end
       comp_2 = SemanticRange::Comparator.new(c[1], nil)
       expect(comp_1.intersects(comp_2)).to eq(c[2])
       expect(comp_2.intersects(comp_1)).to eq(c[2])
+
+      # Backwards-compatibility
+      expect(comp_1.intersects(comp_2)).to eq(c[2])
+      expect(comp_2.intersects(comp_1)).to eq(c[2])
     end
   end
 
@@ -746,6 +750,9 @@ end
     ].each do |c|
       comp = SemanticRange::Comparator.new(c[0], nil)
       range = SemanticRange::Range.new(c[1])
+      expect(comp.satisfies_range?(range)).to eq(c[2])
+
+      # Backwards-compatibility
       expect(comp.satisfies_range(range)).to eq(c[2])
     end
   end
