@@ -230,14 +230,14 @@ module SemanticRange
 
     return nil unless version.is_a?(String)
 
-    version.strip!
+    stripped_version = version.strip
 
-    return nil if version.length > MAX_LENGTH
+    return nil if stripped_version.length > MAX_LENGTH
 
     rxp = loose ? LOOSE : FULL
-    return nil if !rxp.match(version)
+    return nil if !rxp.match(stripped_version)
 
-    Version.new(version, loose)
+    Version.new(stripped_version, loose)
   end
 
   def self.increment!(version, release, loose, identifier)
