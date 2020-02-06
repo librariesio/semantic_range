@@ -64,6 +64,9 @@ module SemanticRange
       # caret trim
       range = range.gsub(CARETTRIM, '\1^')
 
+      # comma trim
+      range = range.gsub(',', ' ')
+
       # normalise spaces
       range = range.split(/\s+/).join(' ')
 
