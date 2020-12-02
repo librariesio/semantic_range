@@ -153,10 +153,10 @@ module SemanticRange
     Range.new(range, loose, platform).test(version)
   end
 
-  def self.only_satisfying(versions, range, loose = false, platform = nil)
+  def self.filter(versions, range, loose = false, platform = nil)
     return [] if !valid_range(range, loose, platform)
 
-    versions.select { |v| SemanticRange.satisfies?(v, range, loose, platform) }
+    versions.filter { |v| SemanticRange.satisfies?(v, range, loose, platform) }
   end
 
   def self.max_satisfying(versions, range, loose = false, platform = nil)

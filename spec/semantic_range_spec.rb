@@ -782,7 +782,7 @@ end
         ['1.3.0', ['1.3.0', '2.0.0'], ['1.3.0']],
         ['>=1.3.0', ['1.0.0', '1.3.0', '2.0.0'], ['1.3.0', '2.0.0']]
     ].each do |range, versions, expected|
-      expect(SemanticRange.only_satisfying(versions, range)).to eq(expected)
+      expect(SemanticRange.filter(versions, range)).to eq(expected)
     end
   end
 
