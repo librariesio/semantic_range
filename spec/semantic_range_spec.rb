@@ -774,6 +774,18 @@ end
     end
   end
 
+  it 'filters an array of versions that satisfy a range' do
+    [
+        ['1.3.0 || <1.0.0 || >2.0.0', ['0.9.0', '1.3.0', '1.5.0', '2.0.5'], ['0.9.0', '1.3.0', '2.0.5']],
+        ['1.0.0 - 1.2.0', ['0.1.0', '1.0.1', '1.1.1', '1.2.0', '1.2.1'], ['1.0.1', '1.1.1', '1.2.0']],
+        ['^0.5.0', ['0.5.1', '0.6.0'], ['0.5.1']],
+        ['1.3.0', ['1.3.0', '2.0.0'], ['1.3.0']],
+        ['>=1.3.0', ['1.0.0', '1.3.0', '2.0.0'], ['1.3.0', '2.0.0']]
+    ].each do |range, versions, expected|
+      expect(SemanticRange.only_satisfying(versions, range)).to eq(expected)
+    end
+  end
+
   it 'has backwards-compatible aliases for inquisitive methods' do
     expect(SemanticRange.method(:gt)).to eq(SemanticRange.method(:gt?))
     expect(SemanticRange.method(:gtr)).to eq(SemanticRange.method(:gtr?))
