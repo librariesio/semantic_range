@@ -104,8 +104,8 @@ describe SemanticRange do
       range = tuple[0]
       version = tuple[1]
       loose = tuple[2]
-      expect(SemanticRange.satisfies?(version, range, loose, 'Rubygems')).to eq(true), "#{tuple}"
-      expect(SemanticRange.satisfies?(version, range, loose, 'Packagist')).to eq(true), "#{tuple}"
+      expect(SemanticRange.satisfies?(version, range, loose: loose, platform: 'Rubygems')).to eq(true), "#{tuple}"
+      expect(SemanticRange.satisfies?(version, range, loose: loose, platform: 'Packagist')).to eq(true), "#{tuple}"
     end
   end
 
@@ -183,8 +183,8 @@ describe SemanticRange do
       range = tuple[0]
       version = tuple[1]
       loose = tuple[2]
-      expect(SemanticRange.satisfies?(version, range, loose, 'Rubygems')).to eq(false), "#{tuple}"
-      expect(SemanticRange.satisfies?(version, range, loose, 'Packagist')).to eq(false), "#{tuple}"
+      expect(SemanticRange.satisfies?(version, range, loose: loose, platform: 'Rubygems')).to eq(false), "#{tuple}"
+      expect(SemanticRange.satisfies?(version, range, loose: loose, platform: 'Packagist')).to eq(false), "#{tuple}"
     end
   end
 
@@ -265,8 +265,8 @@ describe SemanticRange do
       pre = tuple[0]
       wanted = tuple[1]
       loose = tuple[2]
-      expect(SemanticRange.valid_range(pre, loose, 'Rubygems')).to eq(wanted)
-      expect(SemanticRange.valid_range(pre, loose, 'Packagist')).to eq(wanted)
+      expect(SemanticRange.valid_range(pre, loose: loose, platform: 'Rubygems')).to eq(wanted)
+      expect(SemanticRange.valid_range(pre, loose: loose, platform: 'Packagist')).to eq(wanted)
     end
   end
 
@@ -278,7 +278,7 @@ describe SemanticRange do
       [['1.1.0', '1.2.0', '1.2.1', '1.3.0', '2.0.0b1', '2.0.0b2', '2.0.0b3', '2.0.0', '2.1.0'], '~2.0.0', '2.0.0', true]
     ].each do |v|
       versions, range, expected, loose = v
-      expect(SemanticRange.max_satisfying(versions, range, loose, 'Rubygems')).to eq(expected)
+      expect(SemanticRange.max_satisfying(versions, range, loose: loose, platform: 'Rubygems')).to eq(expected)
     end
   end
 
@@ -356,7 +356,7 @@ describe SemanticRange do
       ['<*', [['<0.0.0']]]
     ].each do |v|
       pre, wanted = v
-      found = SemanticRange.to_comparators(pre, false, 'Rubygems')
+      found = SemanticRange.to_comparators(pre, loose: false, platform: 'Rubygems')
       jw = wanted.to_json
       expect(found).to eq(wanted), "to_comparators(#{pre}), expected #{found} to eq #{jw}"
     end

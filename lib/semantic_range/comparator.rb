@@ -17,7 +17,7 @@ module SemanticRange
     def test(version)
       return true if @semver == ANY
       version = Version.new(version, @loose) if version.is_a?(String)
-      SemanticRange.cmp(version, @operator, @semver, @loose)
+      SemanticRange.cmp(version, @operator, @semver, loose: @loose)
     end
 
     def parse(comp)
@@ -27,26 +27,26 @@ module SemanticRange
       @operator = m[1]
       @operator = '' if @operator == '='
 
-      @semver = !m[2] ? ANY : Version.new(m[2], @loose)
+      @semver = !m[2] ? ANY : Version.new(m[2], loose: @loose)
     end
 
-    def intersects?(comp, loose = false, platform = nil)
+    def intersects?(comp, loose: false, platform: nil)
       comp = Comparator.new(comp, loose)
 
       if @operator == ''
-        range_b = Range.new(comp.value, loose, platform)
-        SemanticRange.satisfies?(@value, range_b, loose, platform)
+        range_b = Range.new(comp.value, loose: loose, platform: platform)
+        SemanticRange.satisfies?(@value, range_b, loose: loose, platform: platform)
       elsif comp.operator == ''
-        range_a = Range.new(@value, loose, platform)
-        SemanticRange.satisfies?(comp.semver, range_a, loose, platform)
+        range_a = Range.new(@value, loose: loose, platform: platform)
+        SemanticRange.satisfies?(comp.semver, range_a, loose: loose, platform: platform)
       else
         same_direction_increasing      = (@operator == '>=' || @operator == '>') && (comp.operator == '>=' || comp.operator == '>')
         same_direction_decreasing      = (@operator == '<=' || @operator == '<') && (comp.operator == '<=' || comp.operator == '<')
         same_version                   = @semver.raw == comp.semver.raw
         different_directions_inclusive = (@operator == '>=' || @operator == '<=') && (comp.operator == '>=' || comp.operator == '<=')
-        opposite_directions_lte        = SemanticRange.cmp(@semver, '<', comp.semver, loose) &&
+        opposite_directions_lte        = SemanticRange.cmp(@semver, '<', comp.semver, loose: loose) &&
             ((@operator == '>=' || @operator == '>') && (comp.operator == '<=' || comp.operator == '<'))
-        opposite_directions_gte        = SemanticRange.cmp(@semver, '>', comp.semver, loose) &&
+        opposite_directions_gte        = SemanticRange.cmp(@semver, '>', comp.semver, loose: loose) &&
             ((@operator == '<=' || @operator == '<') && (comp.operator == '>=' || comp.operator == '>'))
 
         same_direction_increasing || same_direction_decreasing || (same_version && different_directions_inclusive) ||
@@ -54,12 +54,12 @@ module SemanticRange
       end
     end
 
-    def satisfies_range?(range, loose = false, platform = nil)
-      range = Range.new(range, loose, platform)
+    def satisfies_range?(range, loose: false, platform: nil)
+      range = Range.new(range, loose: loose, platform: platform)
 
       range.set.any? do |comparators|
         comparators.all? do |comparator|
-          intersects?(comparator, loose, platform)
+          intersects?(comparator, loose: loose, platform: platform)
         end
       end
     end

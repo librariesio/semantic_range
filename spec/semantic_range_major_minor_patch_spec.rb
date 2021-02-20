@@ -9,8 +9,8 @@ describe SemanticRange do
     expect(SemanticRange.parse('v5.2.3').major).to eq(5)
     expect(SemanticRange.parse(' v8.2.3 ').major).to eq(8)
     expect(SemanticRange.parse("\t13.2.3").major).to eq(13)
-    expect(SemanticRange.parse('=21.2.3', true).major).to eq(21)
-    expect(SemanticRange.parse('v=34.2.3', true).major).to eq(34)
+    expect(SemanticRange.parse('=21.2.3', loose: true).major).to eq(21)
+    expect(SemanticRange.parse('v=34.2.3', loose: true).major).to eq(34)
   end
 
   it 'minor' do
@@ -21,8 +21,8 @@ describe SemanticRange do
     expect(SemanticRange.parse('v1.5.3').minor).to eq(5)
     expect(SemanticRange.parse(' v1.8.3 ').minor).to eq(8)
     expect(SemanticRange.parse("\t1.13.3").minor).to eq(13)
-    expect(SemanticRange.parse('=1.21.3', true).minor).to eq(21)
-    expect(SemanticRange.parse('v=1.34.3', true).minor).to eq(34)
+    expect(SemanticRange.parse('=1.21.3', loose: true).minor).to eq(21)
+    expect(SemanticRange.parse('v=1.34.3', loose: true).minor).to eq(34)
   end
 
   it 'patch' do
@@ -33,7 +33,7 @@ describe SemanticRange do
     expect(SemanticRange.parse('v1.2.5').patch).to eq(5)
     expect(SemanticRange.parse(' v1.2.8 ').patch).to eq(8)
     expect(SemanticRange.parse("\t1.2.13").patch).to eq(13)
-    expect(SemanticRange.parse('=1.2.21', true).patch).to eq(21)
-    expect(SemanticRange.parse('v=1.2.34', true).patch).to eq(34)
+    expect(SemanticRange.parse('=1.2.21', loose: true).patch).to eq(21)
+    expect(SemanticRange.parse('v=1.2.34', loose: true).patch).to eq(34)
   end
 end

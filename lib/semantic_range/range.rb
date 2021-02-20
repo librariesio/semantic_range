@@ -2,7 +2,7 @@ module SemanticRange
   class Range
     attr_reader :loose, :raw, :range, :set, :platform
 
-    def initialize(range, loose = false, platform = nil)
+    def initialize(range, loose: false, platform: nil)
       range = range.raw if range.is_a?(Range)
       @platform = platform
       @raw = range
@@ -31,7 +31,7 @@ module SemanticRange
 
     def test(version)
       return false if !version
-      version = Version.new(version, @loose) if version.is_a?(String)
+      version = Version.new(version, loose: @loose) if version.is_a?(String)
       @set.any?{|s| test_set(s, version) }
     end
 
@@ -283,12 +283,12 @@ module SemanticRange
       "#{from} #{to}".strip
     end
 
-    def intersects(range, loose = false, platform = nil)
-      range = Range.new(range, loose, platform)
+    def intersects(range, loose: false, platform: nil)
+      range = Range.new(range, loose: loose, platform: platform)
 
       @set.any? do |comparators|
         comparators.all? do |comparator|
-          comparator.satisfies_range(range, loose, platform)
+          comparator.satisfies_range(range, loose: loose, platform: platform)
         end
       end
     end
