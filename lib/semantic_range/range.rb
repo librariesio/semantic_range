@@ -2,11 +2,12 @@ module SemanticRange
   class Range
     attr_reader :loose, :raw, :range, :set, :platform
 
-    def initialize(range, loose: false, platform: nil)
+    def initialize(range, loose: false, platform: nil, include_prerelease: false)
       range = range.raw if range.is_a?(Range)
       @platform = platform
       @raw = range
       @loose = loose
+      @include_prerelease = include_prerelease
       split = range.split(/\s*\|\|\s*/)
       split = ['', ''] if range == '||'
       split = [''] if split == []
@@ -37,7 +38,7 @@ module SemanticRange
 
     def test_set(set, version)
       return false if set.any? {|comp| !comp.test(version) }
-      if version.prerelease.length > 0
+      if version.prerelease.length > 0 && !@include_prerelease
         set.each do |comp|
           next if comp.semver == ANY
 

@@ -148,9 +148,9 @@ module SemanticRange
     true
   end
 
-  def self.satisfies?(version, range, loose: false, platform: nil)
+  def self.satisfies?(version, range, loose: false, platform: nil, include_prerelease: false)
     return false if !valid_range(range, loose: loose, platform: platform)
-    Range.new(range, loose: loose, platform: platform).test(version)
+    Range.new(range, loose: loose, platform: platform, include_prerelease: include_prerelease).test(version)
   end
 
   def self.filter(versions, range, loose: false, platform: nil)

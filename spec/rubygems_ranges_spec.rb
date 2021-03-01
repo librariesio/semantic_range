@@ -109,6 +109,17 @@ describe SemanticRange do
     end
   end
 
+  it 'range with prerelease' do
+    [
+      ['>=1 <3', '1.23.0-20210103.1434']
+    ].each do |tuple|
+      range = tuple[0]
+      version = tuple[1]
+      loose = tuple[2]
+      expect(SemanticRange.satisfies?(version, range, loose: loose, include_prerelease: true)).to eq(true), "#{tuple}"
+    end
+  end
+
   it 'negative range for rubygems/packagist' do
     [
       ['1.0.0 - 2.0.0', '2.2.3'],
