@@ -4,7 +4,7 @@ module SemanticRange
   class Version
     attr_reader :major, :minor, :patch, :prerelease
 
-    def initialize(version, loose = false)
+    def initialize(version, loose: false)
       @raw = version
       @loose = loose
 
@@ -45,13 +45,13 @@ module SemanticRange
     end
 
     def compare(other)
-      other = Version.new(other, @loose) unless other.is_a?(Version)
+      other = Version.new(other, loose: @loose) unless other.is_a?(Version)
       res = truthy(compare_main(other)) || truthy(compare_pre(other))
       res.is_a?(FalseClass) ? 0 : res
     end
 
     def compare_main(other)
-      other = Version.new(other, @loose) unless other.is_a?(Version)
+      other = Version.new(other, loose: @loose) unless other.is_a?(Version)
       truthy(self.class.compare_identifiers(@major, other.major)) ||
       truthy(self.class.compare_identifiers(@minor, other.minor)) ||
       truthy(self.class.compare_identifiers(@patch, other.patch))

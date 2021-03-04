@@ -50,15 +50,15 @@ module SemanticRange
   class InvalidComparator < StandardError; end
   class InvalidRange < StandardError; end
 
-  def self.ltr?(version, range, loose = false, platform = nil)
-    outside?(version, range, '<', loose, platform)
+  def self.ltr?(version, range, loose: false, platform: nil)
+    outside?(version, range, '<', loose: loose, platform: platform)
   end
 
-  def self.gtr?(version, range, loose = false, platform = nil)
-    outside?(version, range, '>', loose, platform)
+  def self.gtr?(version, range, loose: false, platform: nil)
+    outside?(version, range, '>', loose: loose, platform: platform)
   end
 
-  def self.cmp(a, op, b, loose = false)
+  def self.cmp(a, op, b, loose: false)
     case op
     when '==='
       a = a.version if !a.is_a?(String)
@@ -69,27 +69,27 @@ module SemanticRange
       b = b.version if !b.is_a?(String)
       a != b
     when '', '=', '=='
-      eq?(a, b, loose)
+      eq?(a, b, loose: loose)
     when '!='
-      neq?(a, b, loose)
+      neq?(a, b, loose: loose)
     when '>'
-      gt?(a, b, loose)
+      gt?(a, b, loose: loose)
     when '>='
-      gte?(a, b, loose)
+      gte?(a, b, loose: loose)
     when '<'
-      lt?(a, b, loose)
+      lt?(a, b, loose: loose)
     when '<='
-      lte?(a, b, loose)
+      lte?(a, b, loose: loose)
     else
       raise 'Invalid operator: ' + op
     end
   end
 
-  def self.outside?(version, range, hilo, loose = false, platform = nil)
-    version = Version.new(version, loose)
-    range = Range.new(range, loose, platform)
+  def self.outside?(version, range, hilo, loose: false, platform: nil)
+    version = Version.new(version, loose: loose)
+    range = Range.new(range, loose: loose, platform: platform)
 
-    return false if satisfies?(version, range, loose, platform)
+    return false if satisfies?(version, range, loose: loose, platform: platform)
 
     case hilo
     when '>'
@@ -114,15 +114,15 @@ module SemanticRange
 
         case hilo
         when '>'
-          if gt?(comparator.semver, high.semver, loose)
+          if gt?(comparator.semver, high.semver, loose: loose)
             high = comparator
-          elsif lt?(comparator.semver, low.semver, loose)
+          elsif lt?(comparator.semver, low.semver, loose: loose)
             low = comparator
           end
         when '<'
-          if lt?(comparator.semver, high.semver, loose)
+          if lt?(comparator.semver, high.semver, loose: loose)
             high = comparator
-          elsif gt?(comparator.semver, low.semver, loose)
+          elsif gt?(comparator.semver, low.semver, loose: loose)
             low = comparator
           end
         end
@@ -132,15 +132,15 @@ module SemanticRange
 
       case hilo
       when '>'
-        if (low.operator.empty? || low.operator == comp) && lte?(version, low.semver, loose)
+        if (low.operator.empty? || low.operator == comp) && lte?(version, low.semver, loose: loose)
           return false;
-        elsif (low.operator == ecomp && lt?(version, low.semver, loose))
+        elsif (low.operator == ecomp && lt?(version, low.semver, loose: loose))
           return false;
         end
       when '<'
-        if (low.operator.empty? || low.operator == comp) && gte?(version, low.semver, loose)
+        if (low.operator.empty? || low.operator == comp) && gte?(version, low.semver, loose: loose)
           return false;
-        elsif low.operator == ecomp && gt?(version, low.semver, loose)
+        elsif low.operator == ecomp && gt?(version, low.semver, loose: loose)
           return false;
         end
       end
@@ -148,28 +148,28 @@ module SemanticRange
     true
   end
 
-  def self.satisfies?(version, range, loose = false, platform = nil)
-    return false if !valid_range(range, loose, platform)
-    Range.new(range, loose, platform).test(version)
+  def self.satisfies?(version, range, loose: false, platform: nil)
+    return false if !valid_range(range, loose: loose, platform: platform)
+    Range.new(range, loose: loose, platform: platform).test(version)
   end
 
-  def self.filter(versions, range, loose = false, platform = nil)
-    return [] if !valid_range(range, loose, platform)
+  def self.filter(versions, range, loose: false, platform: nil)
+    return [] if !valid_range(range, loose: loose, platform: platform)
 
-    versions.filter { |v| SemanticRange.satisfies?(v, range, loose, platform) }
+    versions.filter { |v| SemanticRange.satisfies?(v, range, loose: loose, platform: platform) }
   end
 
-  def self.max_satisfying(versions, range, loose = false, platform = nil)
+  def self.max_satisfying(versions, range, loose: false, platform: nil)
     versions.select { |version|
-      satisfies?(version, range, loose, platform)
+      satisfies?(version, range, loose: loose, platform: platform)
     }.sort { |a, b|
-      rcompare(a, b, loose)
+      rcompare(a, b, loose: loose)
     }[0] || nil
   end
 
-  def self.valid_range(range, loose = false, platform = nil)
+  def self.valid_range(range, loose: false, platform: nil)
     begin
-      r = Range.new(range, loose, platform).range
+      r = Range.new(range, loose: loose, platform: platform).range
       r = '*' if r.nil? || r.empty?
       r
     rescue
@@ -177,61 +177,61 @@ module SemanticRange
     end
   end
 
-  def self.compare(a, b, loose = false)
-    Version.new(a, loose).compare(b)
+  def self.compare(a, b, loose: false)
+    Version.new(a, loose: loose).compare(b)
   end
 
   def self.compare_loose(a, b)
-    compare(a, b, true)
+    compare(a, b, loose: true)
   end
 
-  def self.rcompare(a, b, loose = false)
-    compare(b, a, true)
+  def self.rcompare(a, b, loose: false)
+    compare(b, a, loose: true)
   end
 
-  def self.sort(list, loose = false)
+  def self.sort(list, loose: false)
     # TODO
   end
 
-  def self.rsort(list, loose = false)
+  def self.rsort(list, loose: false)
     # TODO
   end
 
-  def self.lt?(a, b, loose = false)
-    compare(a, b, loose) < 0
+  def self.lt?(a, b, loose: false)
+    compare(a, b, loose: loose) < 0
   end
 
-  def self.gt?(a, b, loose = false)
-    compare(a, b, loose) > 0
+  def self.gt?(a, b, loose: false)
+    compare(a, b, loose: loose) > 0
   end
 
-  def self.eq?(a, b, loose = false)
-    compare(a, b, loose) == 0
+  def self.eq?(a, b, loose: false)
+    compare(a, b, loose: loose) == 0
   end
 
-  def self.neq?(a, b, loose = false)
-    compare(a, b, loose) != 0
+  def self.neq?(a, b, loose: false)
+    compare(a, b, loose: loose) != 0
   end
 
-  def self.gte?(a, b, loose = false)
-    compare(a, b, loose) >= 0
+  def self.gte?(a, b, loose: false)
+    compare(a, b, loose: loose) >= 0
   end
 
-  def self.lte?(a, b, loose = false)
-    compare(a, b, loose) <= 0
+  def self.lte?(a, b, loose: false)
+    compare(a, b, loose: loose) <= 0
   end
 
-  def self.valid(version, loose = false)
-    v = parse(version, loose)
+  def self.valid(version, loose: false)
+    v = parse(version, loose: loose)
     return v ? v.version : nil
   end
 
-  def self.clean(version, loose = false)
-    s = parse(version.strip.gsub(/^[=v]+/, ''), loose)
+  def self.clean(version, loose: false)
+    s = parse(version.strip.gsub(/^[=v]+/, ''), loose: loose)
     return s ? s.version : nil
   end
 
-  def self.parse(version, loose = false)
+  def self.parse(version, loose: false)
     return version if version.is_a?(Version)
 
     return nil unless version.is_a?(String)
@@ -243,23 +243,18 @@ module SemanticRange
     rxp = loose ? LOOSE : FULL
     return nil if !rxp.match(stripped_version)
 
-    Version.new(stripped_version, loose)
+    Version.new(stripped_version, loose: loose)
   end
 
-  def self.increment!(version, release, loose, identifier)
-    if loose.is_a? String
-      identifier = loose
-      loose = false
-    end
-
-    Version.new(version, loose).increment!(release, identifier).version
+  def self.increment!(version, release, identifier, loose: false)
+    Version.new(version, loose: loose).increment!(release, identifier).version
   rescue InvalidIncrement, InvalidVersion
     nil
   end
 
   def self.diff(a, b)
-    a = Version.new(a, false) unless a.kind_of?(Version)
-    b = Version.new(b, false) unless b.kind_of?(Version)
+    a = Version.new(a, loose: false) unless a.kind_of?(Version)
+    b = Version.new(b, loose: false) unless b.kind_of?(Version)
     pre_diff = a.prerelease.to_s != b.prerelease.to_s
     pre = pre_diff ? 'pre' : ''
     return "#{pre}major" if a.major != b.major
@@ -268,8 +263,8 @@ module SemanticRange
     return "prerelease"  if pre_diff
   end
 
-  def self.to_comparators(range, loose = false, platform = nil)
-    Range.new(range, loose, platform).set.map do |comp|
+  def self.to_comparators(range, loose: false, platform: nil)
+    Range.new(range, loose: loose, platform: platform).set.map do |comp|
       comp.map(&:to_s)
     end
   end

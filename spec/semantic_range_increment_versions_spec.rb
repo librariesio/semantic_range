@@ -88,7 +88,7 @@ describe SemanticRange do
     ].each do |v|
       pre, what, wanted, loose, id = v
       input = [pre, what, loose, id]
-      got = SemanticRange.increment!(*input)
+      got = SemanticRange.increment!(pre, what, id, loose: loose)
       expect(got).to eq(wanted), "#{input}, expected #{got} to eq #{wanted}"
     end
   end
