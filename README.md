@@ -2,6 +2,11 @@
 
 [node-semver](https://github.com/npm/node-semver) written in Ruby for comparison and inclusion of semantic versions and ranges.
 
+**NOTE: current `master` and releases `>= 3` use keyword arguments instead of positional arguments to pass options.
+If you used `SemanticRange.compare(a, b, true)` in SemanticRange 2, in SemanticRange 3 use `SemanticRange.compare(a, b, loose: true)`**
+
+
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -29,6 +34,14 @@ SemanticRange.satisfies?('1.2.3', '1.x || >=2.5.0 || 5.0.0 - 7.2.3') # true
 SemanticRange.gt?('1.2.3', '9.8.7') # false
 SemanticRange.lt?('1.2.3', '9.8.7') # true
 ```
+
+### Options
+All functions support optional keyword arguments that modify default behavior. The options supported are:
+* `loose` Be more forgiving about not-quite-valid semver strings. Any resulting output will always be 100% strict compliant. `false` by default.
+
+Some functions support `platform` option:
+* `platform` Changes behavior for `'Rubygems'` and `'Packagist'`. `nil` by default. See https://github.com/librariesio/semantic_range/issues/59
+
 
 ## Development
 
