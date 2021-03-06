@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe SemanticRange do
   it 'gtr' do
-    # [version, range, loose]
+    # [version, range, options]
     # Version should be greater than range
     expect(SemanticRange.gtr?('1.3.0', '~1.2.2')).to eq(true)
     expect(SemanticRange.gtr?('0.7.1-1', '~0.6.1-1')).to eq(true)
@@ -70,10 +70,11 @@ describe SemanticRange do
     expect(SemanticRange.gtr?('1.0.0beta', '< 1', loose: true)).to eq(true)
     expect(SemanticRange.gtr?('0.8.2', '=0.7.x')).to eq(true)
     expect(SemanticRange.gtr?('0.7.2', '<0.7.x')).to eq(true)
+    expect(SemanticRange.gtr?('0.7.2-beta', '<0.7.x')).to eq(true)
   end
 
   it 'negative gtr' do
-    # [version, range, loose]
+    # [version, range, options]
     # Version should NOT be greater than range
     expect(SemanticRange.gtr?('0.6.1-1', '~0.6.1-1')).to eq(false)
     expect(SemanticRange.gtr?('1.2.3', '1.0.0 - 2.0.0')).to eq(false)
@@ -156,5 +157,6 @@ describe SemanticRange do
     expect(SemanticRange.gtr?('1.0.0beta', '^0.1.0 || ~3.0.1 || 5.0.0', loose: true)).to eq(false)
     expect(SemanticRange.gtr?('5.0.0-0', '^0.1.0 || ~3.0.1 || 5.0.0', loose: true)).to eq(false)
     expect(SemanticRange.gtr?('3.5.0', '^0.1.0 || ~3.0.1 || >4 <=5.0.0')).to eq(false)
+    expect(SemanticRange.gtr?('0.7.2-beta', '0.7.x', include_prerelease: true)).to eq(false)
   end
 end

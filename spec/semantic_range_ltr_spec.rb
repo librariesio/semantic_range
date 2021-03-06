@@ -74,92 +74,98 @@ describe SemanticRange do
   end
 
   it 'negative ltr' do
-    # [version, range, loose]
+    # [version, range, options]
     # Version should NOT be less than range
-    expect(SemanticRange.ltr?('1.2.4', '1.2.4')).to eq(false)
-    expect(SemanticRange.ltr?('1.1.0', '~ 1.0')).to eq(false)
-    expect(SemanticRange.ltr?('0.6.1-1', '~0.6.1-1')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.3', '1.0.0 - 2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('2.9.9', '1.0.0 - 2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0', '1.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('0.2.4', '>=*')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0', '', loose: true)).to eq(false)
-    expect(SemanticRange.ltr?('1.2.3', '*')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0', '>=1.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.1', '>=1.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.1.0', '>=1.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.1', '>1.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.1.0', '>1.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('2.0.0', '<=2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.9999.9999', '<=2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('0.2.9', '<=2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.9999.9999', '<2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('0.2.9', '<2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0', '>= 1.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.1', '>=  1.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.1.0', '>=   1.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.1', '> 1.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.1.0', '>  1.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('2.0.0', '<=   2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.9999.9999', '<= 2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('0.2.9', '<=  2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.9999.9999', '<    2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('0.2.9', "<\t2.0.0")).to eq(false)
-    expect(SemanticRange.ltr?('v0.1.97', '>=0.1.97')).to eq(false)
-    expect(SemanticRange.ltr?('0.1.97', '>=0.1.97')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.4', '0.1.20 || 1.2.4')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.4', '0.1.20 || >1.2.4')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.3', '0.1.20 || 1.2.4')).to eq(false)
-    expect(SemanticRange.ltr?('0.1.20', '0.1.20 || 1.2.4')).to eq(false)
-    expect(SemanticRange.ltr?('0.0.0', '>=0.2.3 || <0.0.1')).to eq(false)
-    expect(SemanticRange.ltr?('0.2.3', '>=0.2.3 || <0.0.1')).to eq(false)
-    expect(SemanticRange.ltr?('0.2.4', '>=0.2.3 || <0.0.1')).to eq(false)
-    expect(SemanticRange.ltr?('1.3.4', '||')).to eq(false)
-    expect(SemanticRange.ltr?('2.1.3', '2.x.x')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.3', '1.2.x')).to eq(false)
-    expect(SemanticRange.ltr?('2.1.3', '1.2.x || 2.x')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.3', '1.2.x || 2.x')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.3', 'x')).to eq(false)
-    expect(SemanticRange.ltr?('2.1.3', '2.*.*')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.3', '1.2.*')).to eq(false)
-    expect(SemanticRange.ltr?('2.1.3', '1.2.* || 2.*')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.3', '1.2.* || 2.*')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.3', '1.2.* || 2.*')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.3', '*')).to eq(false)
-    expect(SemanticRange.ltr?('2.1.2', '2')).to eq(false)
-    expect(SemanticRange.ltr?('2.3.1', '2.3')).to eq(false)
-    expect(SemanticRange.ltr?('2.4.0', '~2.4')).to eq(false) # >=2.4.0 <2.5.))
-    expect(SemanticRange.ltr?('2.4.5', '~2.4')).to eq(false)
-    expect(SemanticRange.ltr?('3.2.2', '~>3.2.1')).to eq(false) # >=3.2.1 <3.3.))
-    expect(SemanticRange.ltr?('1.2.3', '~1')).to eq(false) # >=1.0.0 <2.0.))
-    expect(SemanticRange.ltr?('1.2.3', '~>1')).to eq(false)
-    expect(SemanticRange.ltr?('1.2.3', '~> 1')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.2', '~1.0')).to eq(false) # >=1.0.0 <1.1.))
-    expect(SemanticRange.ltr?('1.0.2', '~ 1.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0', '>=1')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0', '>= 1')).to eq(false)
-    expect(SemanticRange.ltr?('1.1.1', '<1.2')).to eq(false)
-    expect(SemanticRange.ltr?('1.1.1', '< 1.2')).to eq(false)
-    expect(SemanticRange.ltr?('0.5.5', '~v0.5.4-pre')).to eq(false)
-    expect(SemanticRange.ltr?('0.5.4', '~v0.5.4-pre')).to eq(false)
-    expect(SemanticRange.ltr?('0.7.2', '=0.7.x')).to eq(false)
-    expect(SemanticRange.ltr?('0.7.2', '>=0.7.x')).to eq(false)
-    expect(SemanticRange.ltr?('0.6.2', '<=0.7.x')).to eq(false)
-    expect(SemanticRange.ltr?('0.2.5', '>0.2.3 >0.2.4 <=0.2.5')).to eq(false)
-    expect(SemanticRange.ltr?('0.2.4', '>=0.2.3 <=0.2.4')).to eq(false)
-    expect(SemanticRange.ltr?('2.0.0', '1.0.0 - 2.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('4.0.0', '^3.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('2.0.0', '^1.0.0 || ~2.0.1')).to eq(false)
-    expect(SemanticRange.ltr?('3.2.0', '^0.1.0 || ~3.0.1 || 5.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0beta', '^0.1.0 || ~3.0.1 || 5.0.0', loose: true)).to eq(false)
-    expect(SemanticRange.ltr?('5.0.0-0', '^0.1.0 || ~3.0.1 || 5.0.0', loose: true)).to eq(false)
-    expect(SemanticRange.ltr?('3.5.0', '^0.1.0 || ~3.0.1 || >4 <=5.0.0')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0beta', '^1.0.0alpha', loose: true)).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0beta', '~1.0.0alpha', loose: true)).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0beta', '^1.0.0-alpha', loose: true)).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0beta', '~1.0.0-alpha', loose: true)).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0-beta', '^1.0.0-alpha')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0-beta', '~1.0.0-alpha')).to eq(false)
-    expect(SemanticRange.ltr?('1.0.0', '=0.1.0')).to eq(false)
+    [['~ 1.0', '1.1.0'],
+     ['~0.6.1-1', '0.6.1-1'],
+     ['1.0.0 - 2.0.0', '1.2.3'],
+     ['1.0.0 - 2.0.0', '2.9.9'],
+     ['1.0.0', '1.0.0'],
+     ['>=*', '0.2.4'],
+     ['', '1.0.0', loose: true],
+     ['*', '1.2.3'],
+     ['>=1.0.0', '1.0.0'],
+     ['>=1.0.0', '1.0.1'],
+     ['>=1.0.0', '1.1.0'],
+     ['>1.0.0', '1.0.1'],
+     ['>1.0.0', '1.1.0'],
+     ['<=2.0.0', '2.0.0'],
+     ['<=2.0.0', '1.9999.9999'],
+     ['<=2.0.0', '0.2.9'],
+     ['<2.0.0', '1.9999.9999'],
+     ['<2.0.0', '0.2.9'],
+     ['>= 1.0.0', '1.0.0'],
+     ['>=  1.0.0', '1.0.1'],
+     ['>=   1.0.0', '1.1.0'],
+     ['> 1.0.0', '1.0.1'],
+     ['>  1.0.0', '1.1.0'],
+     ['<=   2.0.0', '2.0.0'],
+     ['<= 2.0.0', '1.9999.9999'],
+     ['<=  2.0.0', '0.2.9'],
+     ['<    2.0.0', '1.9999.9999'],
+     ["<\t2.0.0", '0.2.9'],
+     ['>=0.1.97', 'v0.1.97'],
+     ['>=0.1.97', '0.1.97'],
+     ['0.1.20 || 1.2.4', '1.2.4'],
+     ['0.1.20 || >1.2.4', '1.2.4'],
+     ['0.1.20 || 1.2.4', '1.2.3'],
+     ['0.1.20 || 1.2.4', '0.1.20'],
+     ['>=0.2.3 || <0.0.1', '0.0.0'],
+     ['>=0.2.3 || <0.0.1', '0.2.3'],
+     ['>=0.2.3 || <0.0.1', '0.2.4'],
+     ['||', '1.3.4'],
+     ['2.x.x', '2.1.3'],
+     ['1.2.x', '1.2.3'],
+     ['1.2.x || 2.x', '2.1.3'],
+     ['1.2.x || 2.x', '1.2.3'],
+     ['x', '1.2.3'],
+     ['2.*.*', '2.1.3'],
+     ['1.2.*', '1.2.3'],
+     ['1.2.* || 2.*', '2.1.3'],
+     ['1.2.* || 2.*', '1.2.3'],
+     ['1.2.* || 2.*', '1.2.3'],
+     ['*', '1.2.3'],
+     ['2', '2.1.2'],
+     ['2.3', '2.3.1'],
+     ['~2.4', '2.4.0'], # >=2.4.0 <2.5.0
+     ['~2.4', '2.4.5'],
+     ['~>3.2.1', '3.2.2'], # >=3.2.1 <3.3.0
+     ['~1', '1.2.3'], # >=1.0.0 <2.0.0
+     ['~>1', '1.2.3'],
+     ['~> 1', '1.2.3'],
+     ['~1.0', '1.0.2'], # >=1.0.0 <1.1.0
+     ['~ 1.0', '1.0.2'],
+     ['>=1', '1.0.0'],
+     ['>= 1', '1.0.0'],
+     ['<1.2', '1.1.1'],
+     ['< 1.2', '1.1.1'],
+     ['~v0.5.4-pre', '0.5.5'],
+     ['~v0.5.4-pre', '0.5.4'],
+     ['=0.7.x', '0.7.2'],
+     ['>=0.7.x', '0.7.2'],
+     ['<=0.7.x', '0.6.2'],
+     ['>0.2.3 >0.2.4 <=0.2.5', '0.2.5'],
+     ['>=0.2.3 <=0.2.4', '0.2.4'],
+     ['1.0.0 - 2.0.0', '2.0.0'],
+     ['^3.0.0', '4.0.0'],
+     ['^1.0.0 || ~2.0.1', '2.0.0'],
+     ['^0.1.0 || ~3.0.1 || 5.0.0', '3.2.0'],
+     ['^0.1.0 || ~3.0.1 || 5.0.0', '1.0.0beta', loose: true],
+     ['^0.1.0 || ~3.0.1 || 5.0.0', '5.0.0-0', loose: true],
+     ['^0.1.0 || ~3.0.1 || >4 <=5.0.0', '3.5.0'],
+     ['^1.0.0alpha', '1.0.0beta', loose: true],
+     ['~1.0.0alpha', '1.0.0beta', loose: true],
+     ['^1.0.0-alpha', '1.0.0beta', loose: true],
+     ['~1.0.0-alpha', '1.0.0beta', loose: true],
+     ['^1.0.0-alpha', '1.0.0-beta'],
+     ['~1.0.0-alpha', '1.0.0-beta'],
+     ['=0.1.0', '1.0.0'],
+     ['>1.2.3', '1.3.0-alpha', include_prerelease: true]
+    ].each do |tuple|
+      range = tuple[0]
+      version = tuple[1]
+      options = tuple[2] || {}
+      expect(SemanticRange.ltr?(version, range, **options)).to eq(false)
+    end
   end
 end
