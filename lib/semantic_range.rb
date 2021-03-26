@@ -155,15 +155,15 @@ module SemanticRange
     Range.new(range, loose: loose, platform: platform, include_prerelease: include_prerelease).test(version)
   end
 
-  def self.filter(versions, range, loose: false, platform: nil)
-    return [] if !valid_range(range, loose: loose, platform: platform)
+  def self.filter(versions, range, loose: false, platform: nil, include_prerelease: false)
+    return [] if !valid_range(range, loose: loose, platform: platform, include_prerelease: include_prerelease)
 
-    versions.filter { |v| SemanticRange.satisfies?(v, range, loose: loose, platform: platform) }
+    versions.filter { |v| SemanticRange.satisfies?(v, range, loose: loose, platform: platform, include_prerelease: include_prerelease) }
   end
 
-  def self.max_satisfying(versions, range, loose: false, platform: nil)
+  def self.max_satisfying(versions, range, loose: false, platform: nil, include_prerelease: false)
     versions.select { |version|
-      satisfies?(version, range, loose: loose, platform: platform)
+      satisfies?(version, range, loose: loose, platform: platform, include_prerelease: include_prerelease)
     }.sort { |a, b|
       rcompare(a, b, loose: loose)
     }[0] || nil
@@ -265,8 +265,8 @@ module SemanticRange
     return "prerelease"  if pre_diff
   end
 
-  def self.to_comparators(range, loose: false, platform: nil)
-    Range.new(range, loose: loose, platform: platform).set.map do |comp|
+  def self.to_comparators(range, loose: false, platform: nil, include_prerelease: false)
+    Range.new(range, loose: loose, platform: platform, include_prerelease: include_prerelease).set.map do |comp|
       comp.map(&:to_s)
     end
   end
