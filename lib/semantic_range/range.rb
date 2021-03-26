@@ -2,11 +2,12 @@ module SemanticRange
   class Range
     attr_reader :loose, :raw, :range, :set, :platform
 
-    def initialize(range, loose: false, platform: nil)
+    def initialize(range, loose: false, platform: nil, include_prerelease: false)
       range = range.raw if range.is_a?(Range)
       @platform = platform
       @raw = range
       @loose = loose
+      @include_prerelease = include_prerelease
       split = range.split(/\s*\|\|\s*/)
       split = ['', ''] if range == '||'
       split = [''] if split == []
@@ -19,6 +20,21 @@ module SemanticRange
 
       raise InvalidRange.new(range) if @set.empty? || @set == [[]]
 
+      if @set.any?
+        first = set.first
+        @set = @set.reject { |c| is_null_set(c[0]) }
+        if @set.empty?
+          @set = [first]
+        elsif @set.any?
+          @set.each do |c|
+            if c.length == 1 && is_any(c[0])
+              @set = [c]
+              break
+            end
+          end
+        end
+      end
+
       format
     end
 
@@ -29,15 +45,25 @@ module SemanticRange
       @range
     end
 
+    def is_null_set(comparator)
+      comparator.value == '<0.0.0-0'
+    end
+
+    def is_any(comparator)
+      comparator.value == ''
+    end
+
     def test(version)
       return false if !version
       version = Version.new(version, loose: @loose) if version.is_a?(String)
       @set.any?{|s| test_set(s, version) }
+    rescue SemanticRange::InvalidVersion
+      false
     end
 
     def test_set(set, version)
       return false if set.any? {|comp| !comp.test(version) }
-      if version.prerelease.length > 0
+      if version.prerelease.length > 0 && !@include_prerelease
         set.each do |comp|
           next if comp.semver == ANY
 
@@ -53,7 +79,8 @@ module SemanticRange
 
     def parse_range(range)
       # expand hyphens
-      range = range.gsub(@loose ? HYPHENRANGELOOSE : HYPHENRANGE){ hyphen_replace(Regexp.last_match) }
+      hyphen_range_regex = @loose ? HYPHENRANGELOOSE : HYPHENRANGE
+      range = range.gsub(hyphen_range_regex){ hyphen_replace(Regexp.last_match) }
 
       # comparator trim
       range = range.gsub(COMPARATORTRIM, '\1\2\3')
@@ -71,34 +98,53 @@ module SemanticRange
       range = range.split(/\s+/).join(' ')
 
       set = range.split(' ').map do |comp|
-        parse_comparator(comp, @loose)
+        parse_comparator(comp)
       end.join(' ').split(/\s+/)
+      set.map! { |comp| replaceGTE0(comp) }
       set = [''] if set == []
 
-      set = set.select{|comp| !!comp.match(COMPARATORLOOSE) } if @loose
+      set = set.select{|comp| comp.match(COMPARATORLOOSE) } if @loose
 
-      set.map{|comp| Comparator.new(comp, @loose) }
+      set.map! {|comp| Comparator.new(comp, @loose) }
+
+      rangeMap = {}
+      set.each do |comp|
+        if is_null_set(comp)
+          return [comp]
+        end
+        rangeMap[comp.value] = comp
+      end
+      if rangeMap.size > 1 && rangeMap.has_key?('')
+        rangeMap.delete('')
+      end
+      rangeMap.values
     end
 
     def isX(id)
       !id || id.downcase == 'x' || id == '*'
     end
 
-    def parse_comparator(comp, loose)
-      comp = replace_carets(comp, loose)
-      comp = replace_tildes(comp, loose)
-      comp = replace_x_ranges(comp, loose)
-      replace_stars(comp, loose)
+    def replaceGTE0(comp)
+      comp.strip.gsub(@include_prerelease ? GTE0PRE : GTE0, '')
     end
 
-    def replace_carets(comp, loose)
+    def parse_comparator(comp)
+      comp = replace_carets(comp)
+      comp = replace_tildes(comp)
+      comp = replace_x_ranges(comp)
+      replace_stars(comp)
+    end
+
+    def replace_carets(comp)
       comp.strip.split(/\s+/).map do |comp|
-        replace_caret(comp, loose)
+        replace_caret(comp)
       end.join(' ')
     end
 
-    def replace_caret(comp, loose)
-      comp.gsub(loose ? CARETLOOSE : CARET) do
+    def replace_caret(comp)
+      z = @include_prerelease ? '-0' : ''
+      comp.gsub(@loose ? CARETLOOSE : CARET) do
+
         match = Regexp.last_match
         mj = match[1]
         m = match[2]
@@ -108,48 +154,45 @@ module SemanticRange
         if isX(mj)
           ''
         elsif isX(m)
-          ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
+          ">=#{mj}.0.0#{z} <#{(mj.to_i + 1)}.0.0-0"
         elsif isX(p)
           if mj == '0'
-            ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
+            ">=#{mj}.#{m}.0#{z} <#{mj}.#{(m.to_i + 1)}.0-0"
           else
-            ">=#{mj}.#{m}.0 <#{(mj.to_i + 1)}.0.0"
+            ">=#{mj}.#{m}.0#{z} <#{(mj.to_i + 1)}.0.0-0"
           end
         elsif pr
-          if pr[0] != '-'
-            pr = "-#{pr}"
-          end
           if mj == '0'
             if m == '0'
-              ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{m}.#{(p.to_i + 1)}"
+              ">=#{mj}.#{m}.#{p}-#{pr} <#{mj}.#{m}.#{(p.to_i + 1)}-0"
             else
-              ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{(m.to_i + 1)}.0"
+              ">=#{mj}.#{m}.#{p}-#{pr} <#{mj}.#{(m.to_i + 1)}.0-0"
             end
           else
-            ">=#{mj}.#{m}.#{p}#{pr} <#{(mj.to_i + 1)}.0.0"
+            ">=#{mj}.#{m}.#{p}-#{pr} <#{(mj.to_i + 1)}.0.0-0"
           end
         else
           if mj == '0'
             if m == '0'
-              ">=#{mj}.#{m}.#{p} <#{mj}.#{m}.#{(p.to_i + 1)}"
+              ">=#{mj}.#{m}.#{p}#{z} <#{mj}.#{m}.#{(p.to_i + 1)}-0"
             else
-              ">=#{mj}.#{m}.#{p} <#{mj}.#{(m.to_i + 1)}.0"
+              ">=#{mj}.#{m}.#{p}#{z} <#{mj}.#{(m.to_i + 1)}.0-0"
             end
           else
-            ">=#{mj}.#{m}.#{p} <#{(mj.to_i + 1)}.0.0"
+            ">=#{mj}.#{m}.#{p} <#{(mj.to_i + 1)}.0.0-0"
           end
         end
       end
     end
 
-    def replace_tildes(comp, loose)
+    def replace_tildes(comp)
       comp.strip.split(/\s+/).map do |comp|
-        replace_tilde(comp, loose)
+        replace_tilde(comp)
       end.join(' ')
     end
 
-    def replace_tilde(comp, loose)
-      comp.gsub(loose ? TILDELOOSE : TILDE) do
+    def replace_tilde(comp)
+      comp.gsub(@loose ? TILDELOOSE : TILDE) do
         match = Regexp.last_match
         mj = match[1]
         m = match[2]
@@ -159,39 +202,37 @@ module SemanticRange
         if isX(mj)
           ''
         elsif isX(m)
-          ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
+          ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0-0"
         elsif isX(p)
           if ['Rubygems', 'Packagist'].include?(platform)
             ">=#{mj}.#{m}.0 <#{mj.to_i+1}.0.0"
           else
-            ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
+            ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0-0"
           end
-
         elsif pr
-          pr = '-' + pr if (pr[0] != '-')
-          ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{(m.to_i + 1)}.0"
+          pr = '-' + pr if pr[0] != '-'
+          ">=#{mj}.#{m}.#{p}#{pr} <#{mj}.#{(m.to_i + 1)}.0-0"
         else
-          ">=#{mj}.#{m}.#{p} <#{mj}.#{(m.to_i + 1)}.0"
+          ">=#{mj}.#{m}.#{p} <#{mj}.#{(m.to_i + 1)}.0-0"
         end
       end
     end
 
-    def replace_x_ranges(comp, loose)
+    def replace_x_ranges(comp)
       comp.strip.split(/\s+/).map do |comp|
-        replace_x_range(comp, loose)
+        replace_x_range(comp)
       end.join(' ')
     end
 
-    def replace_x_range(comp, loose)
+    def replace_x_range(comp)
       comp = comp.strip
-      comp.gsub(loose ? XRANGELOOSE : XRANGE) do
+      comp.gsub(@loose ? XRANGELOOSE : XRANGE) do
         match = Regexp.last_match
         ret = match[0]
         gtlt = match[1]
         mj = match[2]
         m = match[3]
         p = match[4]
-        pr = match[5]
 
         xM = isX(mj)
         xm = xM || isX(m)
@@ -200,9 +241,11 @@ module SemanticRange
 
         gtlt = '' if gtlt == '=' && anyX
 
+        pr = @include_prerelease ? '-0' : ''
+
         if xM
           if gtlt == '>' || gtlt == '<'
-            '<0.0.0'
+            '<0.0.0-0'
           else
             '*'
           end
@@ -229,18 +272,20 @@ module SemanticRange
             end
           end
 
-          "#{gtlt}#{mj}.#{m}.#{p}"
+          pr = '-0' if gtlt == '<'
+
+          "#{gtlt}#{mj}.#{m}.#{p}#{pr}"
         elsif xm
-          ">=#{mj}.0.0 <#{(mj.to_i + 1)}.0.0"
+          ">=#{mj}.0.0#{pr} <#{(mj.to_i + 1)}.0.0-0"
         elsif xp
-          ">=#{mj}.#{m}.0 <#{mj}.#{(m.to_i + 1)}.0"
+          ">=#{mj}.#{m}.0#{pr} <#{mj}.#{(m.to_i + 1)}.0-0"
         else
           ret
         end
       end
     end
 
-    def replace_stars(comp, loose)
+    def replace_stars(comp)
       comp.strip.gsub(STAR, '')
     end
 
@@ -261,21 +306,25 @@ module SemanticRange
       if isX(fM)
         from = ''
       elsif isX(fm)
-        from = ">=#{fM}.0.0"
+        from = ">=#{fM}.0.0#{@include_prerelease ? '-0' : ''}"
       elsif isX(fp)
-        from = ">=#{fM}.#{fm}.0"
-      else
+        from = ">=#{fM}.#{fm}.0#{@include_prerelease ? '-0' : ''}"
+      elsif fpr
         from = ">=#{from}"
+      else
+        from = ">=#{from}#{@include_prerelease ? '-0' : ''}"
       end
 
       if isX(tM)
         to = ''
       elsif isX(tm)
-        to = "<#{(tM.to_i + 1)}.0.0"
+        to = "<#{(tM.to_i + 1)}.0.0-0"
       elsif isX(tp)
-        to = "<#{tM}.#{(tm.to_i + 1)}.0"
+        to = "<#{tM}.#{(tm.to_i + 1)}.0-0"
       elsif tpr
         to = "<=#{tM}.#{tm}.#{tp}-#{tpr}"
+      elsif @include_prerelease
+        to = "<#{tM}.#{tm}.#{tp.to_i + 1}-0"
       else
         to = "<=#{to}"
       end

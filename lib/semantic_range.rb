@@ -4,44 +4,46 @@ require "semantic_range/range"
 require "semantic_range/comparator"
 
 module SemanticRange
-  BUILDIDENTIFIER = /[0-9A-Za-z-]+/
-  BUILD = /(?:\+(#{BUILDIDENTIFIER.source}(?:\.#{BUILDIDENTIFIER.source})*))/
-  NUMERICIDENTIFIER = /0|[1-9]\d*/
-  NUMERICIDENTIFIERLOOSE = /[0-9]+/
-  NONNUMERICIDENTIFIER = /\d*[a-zA-Z-][a-zA-Z0-9-]*/
-  XRANGEIDENTIFIERLOOSE = /#{NUMERICIDENTIFIERLOOSE.source}|x|X|\*/
-  PRERELEASEIDENTIFIERLOOSE =  /(?:#{NUMERICIDENTIFIERLOOSE.source}|#{NONNUMERICIDENTIFIER.source})/
-  PRERELEASELOOSE = /(?:-?(#{PRERELEASEIDENTIFIERLOOSE.source}(?:\.#{PRERELEASEIDENTIFIERLOOSE.source})*))/
-  XRANGEPLAINLOOSE = /[v=\s]*(#{XRANGEIDENTIFIERLOOSE.source})(?:\.(#{XRANGEIDENTIFIERLOOSE.source})(?:\.(#{XRANGEIDENTIFIERLOOSE.source})(?:#{PRERELEASELOOSE.source})?#{BUILD.source}?)?)?/
-  HYPHENRANGELOOSE = /^\s*(#{XRANGEPLAINLOOSE.source})\s+-\s+(#{XRANGEPLAINLOOSE.source})\s*$/
-  PRERELEASEIDENTIFIER = /(?:#{NUMERICIDENTIFIER.source}|#{NONNUMERICIDENTIFIER.source})/
-  PRERELEASE = /(?:-(#{PRERELEASEIDENTIFIER.source}(?:\.#{PRERELEASEIDENTIFIER.source})*))/
-  XRANGEIDENTIFIER = /#{NUMERICIDENTIFIER.source}|x|X|\*/
-  XRANGEPLAIN = /[v=\s]*(#{XRANGEIDENTIFIER.source})(?:\.(#{XRANGEIDENTIFIER.source})(?:\.(#{XRANGEIDENTIFIER.source})(?:#{PRERELEASE.source})?#{BUILD.source}?)?)?/
-  HYPHENRANGE = /^\s*(#{XRANGEPLAIN.source})\s+-\s+(#{XRANGEPLAIN.source})\s*$/
-  MAINVERSIONLOOSE = /(#{NUMERICIDENTIFIERLOOSE.source})\.(#{NUMERICIDENTIFIERLOOSE.source})\.(#{NUMERICIDENTIFIERLOOSE.source})/
-  LOOSEPLAIN = /[v=\s]*#{MAINVERSIONLOOSE.source}#{PRERELEASELOOSE.source}?#{BUILD.source}?/
-  GTLT = /((?:<|>)?=?)/
-  COMPARATORTRIM = /(\s*)#{GTLT.source}\s*(#{LOOSEPLAIN.source}|#{XRANGEPLAIN.source})/
-  LONETILDE = /(?:~>?)/
-  TILDETRIM = /(\s*)#{LONETILDE.source}\s+/
-  LONECARET = /(?:\^)/
-  CARETTRIM = /(\s*)#{LONECARET.source}\s+/
-  STAR = /(<|>)?=?\s*\*/
-  CARET = /^#{LONECARET.source}#{XRANGEPLAIN.source}$/
-  CARETLOOSE = /^#{LONECARET.source}#{XRANGEPLAINLOOSE.source}$/
-  MAINVERSION = /(#{NUMERICIDENTIFIER.source})\.(#{NUMERICIDENTIFIER.source})\.(#{NUMERICIDENTIFIER.source})/
-  FULLPLAIN = /v?#{MAINVERSION.source}#{PRERELEASE.source}?#{BUILD.source}?/
-  FULL = /^#{FULLPLAIN.source}$/
-  LOOSE = /^#{LOOSEPLAIN.source}$/
-  TILDE = /^#{LONETILDE.source}#{XRANGEPLAIN.source}$/
-  TILDELOOSE = /^#{LONETILDE.source}#{XRANGEPLAINLOOSE.source}$/
-  XRANGE = /^#{GTLT.source}\s*#{XRANGEPLAIN.source}$/
-  XRANGELOOSE = /^#{GTLT.source}\s*#{XRANGEPLAINLOOSE.source}$/
-  COMPARATOR = /^#{GTLT.source}\s*(#{FULLPLAIN.source})$|^$/
-  COMPARATORLOOSE = /^#{GTLT.source}\s*(#{LOOSEPLAIN.source})$|^$/
+  BUILDIDENTIFIER = /[0-9A-Za-z-]+/.freeze
+  BUILD = /(?:\+(#{BUILDIDENTIFIER.source}(?:\.#{BUILDIDENTIFIER.source})*))/.freeze
+  NUMERICIDENTIFIER = /0|[1-9]\d*/.freeze
+  NUMERICIDENTIFIERLOOSE = /[0-9]+/.freeze
+  NONNUMERICIDENTIFIER = /\d*[a-zA-Z-][a-zA-Z0-9-]*/.freeze
+  XRANGEIDENTIFIERLOOSE = /#{NUMERICIDENTIFIERLOOSE.source}|x|X|\*/.freeze
+  PRERELEASEIDENTIFIERLOOSE =  /(?:#{NUMERICIDENTIFIERLOOSE.source}|#{NONNUMERICIDENTIFIER.source})/.freeze
+  PRERELEASELOOSE = /(?:-?(#{PRERELEASEIDENTIFIERLOOSE.source}(?:\.#{PRERELEASEIDENTIFIERLOOSE.source})*))/.freeze
+  XRANGEPLAINLOOSE = /[v=\s]*(#{XRANGEIDENTIFIERLOOSE.source})(?:\.(#{XRANGEIDENTIFIERLOOSE.source})(?:\.(#{XRANGEIDENTIFIERLOOSE.source})(?:#{PRERELEASELOOSE.source})?#{BUILD.source}?)?)?/.freeze
+  HYPHENRANGELOOSE = /^\s*(#{XRANGEPLAINLOOSE.source})\s+-\s+(#{XRANGEPLAINLOOSE.source})\s*$/.freeze
+  PRERELEASEIDENTIFIER = /(?:#{NUMERICIDENTIFIER.source}|#{NONNUMERICIDENTIFIER.source})/.freeze
+  PRERELEASE = /(?:-(#{PRERELEASEIDENTIFIER.source}(?:\.#{PRERELEASEIDENTIFIER.source})*))/.freeze
+  XRANGEIDENTIFIER = /#{NUMERICIDENTIFIER.source}|x|X|\*/.freeze
+  XRANGEPLAIN = /[v=\s]*(#{XRANGEIDENTIFIER.source})(?:\.(#{XRANGEIDENTIFIER.source})(?:\.(#{XRANGEIDENTIFIER.source})(?:#{PRERELEASE.source})?#{BUILD.source}?)?)?/.freeze
+  HYPHENRANGE = /^\s*(#{XRANGEPLAIN.source})\s+-\s+(#{XRANGEPLAIN.source})\s*$/.freeze
+  MAINVERSIONLOOSE = /(#{NUMERICIDENTIFIERLOOSE.source})\.(#{NUMERICIDENTIFIERLOOSE.source})\.(#{NUMERICIDENTIFIERLOOSE.source})/.freeze
+  LOOSEPLAIN = /[v=\s]*#{MAINVERSIONLOOSE.source}#{PRERELEASELOOSE.source}?#{BUILD.source}?/.freeze
+  GTLT = /((?:<|>)?=?)/.freeze
+  COMPARATORTRIM = /(\s*)#{GTLT.source}\s*(#{LOOSEPLAIN.source}|#{XRANGEPLAIN.source})/.freeze
+  LONETILDE = /(?:~>?)/.freeze
+  TILDETRIM = /(\s*)#{LONETILDE.source}\s+/.freeze
+  LONECARET = /(?:\^)/.freeze
+  CARETTRIM = /(\s*)#{LONECARET.source}\s+/.freeze
+  STAR = /(<|>)?=?\s*\*/.freeze
+  CARET = /^#{LONECARET.source}#{XRANGEPLAIN.source}$/.freeze
+  CARETLOOSE = /^#{LONECARET.source}#{XRANGEPLAINLOOSE.source}$/.freeze
+  MAINVERSION = /(#{NUMERICIDENTIFIER.source})\.(#{NUMERICIDENTIFIER.source})\.(#{NUMERICIDENTIFIER.source})/.freeze
+  FULLPLAIN = /v?#{MAINVERSION.source}#{PRERELEASE.source}?#{BUILD.source}?/.freeze
+  FULL = /^#{FULLPLAIN.source}$/.freeze
+  LOOSE = /^#{LOOSEPLAIN.source}$/.freeze
+  TILDE = /^#{LONETILDE.source}#{XRANGEPLAIN.source}$/.freeze
+  TILDELOOSE = /^#{LONETILDE.source}#{XRANGEPLAINLOOSE.source}$/.freeze
+  XRANGE = /^#{GTLT.source}\s*#{XRANGEPLAIN.source}$/.freeze
+  XRANGELOOSE = /^#{GTLT.source}\s*#{XRANGEPLAINLOOSE.source}$/.freeze
+  COMPARATOR = /^#{GTLT.source}\s*(#{FULLPLAIN.source})$|^$/.freeze
+  COMPARATORLOOSE = /^#{GTLT.source}\s*(#{LOOSEPLAIN.source})$|^$/.freeze
+  GTE0 = /^\s*>=\s*0\.0\.0\s*$/.freeze
+  GTE0PRE = /^\s*>=\s*0\.0\.0-0\s*$/.freeze
 
-  ANY = {}
+  ANY = {}.freeze
 
   MAX_LENGTH = 256
 
@@ -50,12 +52,12 @@ module SemanticRange
   class InvalidComparator < StandardError; end
   class InvalidRange < StandardError; end
 
-  def self.ltr?(version, range, loose: false, platform: nil)
-    outside?(version, range, '<', loose: loose, platform: platform)
+  def self.ltr?(version, range, loose: false, platform: nil, include_prerelease: false)
+    outside?(version, range, '<', loose: loose, platform: platform, include_prerelease: include_prerelease)
   end
 
-  def self.gtr?(version, range, loose: false, platform: nil)
-    outside?(version, range, '>', loose: loose, platform: platform)
+  def self.gtr?(version, range, loose: false, platform: nil, include_prerelease: false)
+    outside?(version, range, '>', loose: loose, platform: platform, include_prerelease: include_prerelease)
   end
 
   def self.cmp(a, op, b, loose: false)
@@ -85,11 +87,11 @@ module SemanticRange
     end
   end
 
-  def self.outside?(version, range, hilo, loose: false, platform: nil)
+  def self.outside?(version, range, hilo, loose: false, platform: nil, include_prerelease: false)
     version = Version.new(version, loose: loose)
-    range = Range.new(range, loose: loose, platform: platform)
+    range = Range.new(range, loose: loose, platform: platform, include_prerelease: include_prerelease)
 
-    return false if satisfies?(version, range, loose: loose, platform: platform)
+    return false if satisfies?(version, range, loose: loose, platform: platform, include_prerelease: include_prerelease)
 
     case hilo
     when '>'
@@ -148,28 +150,28 @@ module SemanticRange
     true
   end
 
-  def self.satisfies?(version, range, loose: false, platform: nil)
+  def self.satisfies?(version, range, loose: false, platform: nil, include_prerelease: false)
     return false if !valid_range(range, loose: loose, platform: platform)
-    Range.new(range, loose: loose, platform: platform).test(version)
+    Range.new(range, loose: loose, platform: platform, include_prerelease: include_prerelease).test(version)
   end
 
-  def self.filter(versions, range, loose: false, platform: nil)
-    return [] if !valid_range(range, loose: loose, platform: platform)
+  def self.filter(versions, range, loose: false, platform: nil, include_prerelease: false)
+    return [] if !valid_range(range, loose: loose, platform: platform, include_prerelease: include_prerelease)
 
-    versions.filter { |v| SemanticRange.satisfies?(v, range, loose: loose, platform: platform) }
+    versions.filter { |v| SemanticRange.satisfies?(v, range, loose: loose, platform: platform, include_prerelease: include_prerelease) }
   end
 
-  def self.max_satisfying(versions, range, loose: false, platform: nil)
+  def self.max_satisfying(versions, range, loose: false, platform: nil, include_prerelease: false)
     versions.select { |version|
-      satisfies?(version, range, loose: loose, platform: platform)
+      satisfies?(version, range, loose: loose, platform: platform, include_prerelease: include_prerelease)
     }.sort { |a, b|
       rcompare(a, b, loose: loose)
     }[0] || nil
   end
 
-  def self.valid_range(range, loose: false, platform: nil)
+  def self.valid_range(range, loose: false, platform: nil, include_prerelease: false)
     begin
-      r = Range.new(range, loose: loose, platform: platform).range
+      r = Range.new(range, loose: loose, platform: platform, include_prerelease: include_prerelease).range
       r = '*' if r.nil? || r.empty?
       r
     rescue
@@ -263,8 +265,8 @@ module SemanticRange
     return "prerelease"  if pre_diff
   end
 
-  def self.to_comparators(range, loose: false, platform: nil)
-    Range.new(range, loose: loose, platform: platform).set.map do |comp|
+  def self.to_comparators(range, loose: false, platform: nil, include_prerelease: false)
+    Range.new(range, loose: loose, platform: platform, include_prerelease: include_prerelease).set.map do |comp|
       comp.map(&:to_s)
     end
   end
