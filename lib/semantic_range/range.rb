@@ -191,7 +191,6 @@ module SemanticRange
         mj = match[2]
         m = match[3]
         p = match[4]
-        pr = match[5]
 
         xM = isX(mj)
         xm = xM || isX(m)
@@ -249,14 +248,11 @@ module SemanticRange
       fM = match[2]
       fm = match[3]
       fp = match[4]
-      fpr = match[5]
-      fb = match[6]
       to = match[7]
       tM = match[8]
       tm = match[9]
       tp = match[10]
       tpr = match[11]
-      tb = match[12]
 
       if isX(fM)
         from = ''
