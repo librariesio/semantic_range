@@ -1,5 +1,5 @@
 module SemanticRange
-  VERSION = "3.0.0"
+  VERSION = "3.1.0"
 
   class Version
     attr_reader :major, :minor, :patch, :prerelease
