@@ -149,6 +149,9 @@ module SemanticRange
   end
 
   def self.satisfies?(version, range, loose: false, platform: nil)
+    if valid?(range, loose: loose) 
+      return version == range
+    end
     return false if !valid_range(range, loose: loose, platform: platform)
     Range.new(range, loose: loose, platform: platform).test(version)
   end
@@ -221,6 +224,16 @@ module SemanticRange
     compare(a, b, loose: loose) <= 0
   end
 
+  def self.valid?(version, loose: false)
+    return false unless version.is_a?(String)
+
+    stripped_version = version.strip
+    return false if stripped_version.length > MAX_LENGTH
+
+    rxp = loose ? LOOSE : FULL
+    return !!rxp.match(stripped_version)
+  end
+
   def self.valid(version, loose: false)
     v = parse(version, loose: loose)
     return v ? v.version : nil
@@ -233,17 +246,9 @@ module SemanticRange
 
   def self.parse(version, loose: false)
     return version if version.is_a?(Version)
+    return nil unless valid?(version, loose: loose)
 
-    return nil unless version.is_a?(String)
-
-    stripped_version = version.strip
-
-    return nil if stripped_version.length > MAX_LENGTH
-
-    rxp = loose ? LOOSE : FULL
-    return nil if !rxp.match(stripped_version)
-
-    Version.new(stripped_version, loose: loose)
+    Version.new(version.strip, loose: loose)
   end
 
   def self.increment!(version, release, identifier, loose: false)

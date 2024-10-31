@@ -26,6 +26,8 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
+SemanticRange.valid?('1.2.3') # true
+SemanticRange.valid?('a.b.c') # false
 SemanticRange.valid('1.2.3') # '1.2.3'
 SemanticRange.valid('a.b.c') # nil
 SemanticRange.clean('  =v1.2.3   ') # '1.2.3'

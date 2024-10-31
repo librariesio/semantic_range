@@ -62,7 +62,7 @@ module SemanticRange
     end
 
     def last_number_index
-      parts.rindex { |e| e.is_a? Fixnum }
+      parts.rindex { |e| e.is_a? Integer }
     end
 
     def increment!(identifier = nil)
@@ -80,7 +80,7 @@ module SemanticRange
         # 1.2.0-beta.1 bumps to 1.2.0-beta.2,
         # 1.2.0-beta.fooblz or 1.2.0-beta bumps to 1.2.0-beta.0
         if parts[0] == identifier
-          unless parts[1].kind_of?(Fixnum)
+          unless parts[1].kind_of?(Integer)
             @parts = [identifier, 0]
           end
         else

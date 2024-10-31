@@ -149,6 +149,32 @@ describe SemanticRange do
     end
   end
 
+  it 'checks valid?' do
+    [
+      ['1.2.3'],
+      ['1.2.3+build'],
+      ['01.2.3', true],
+      ['0.2.3', false],
+    ].each do |tuple|
+      version = tuple[0]
+      loose = tuple[1]
+      expect(SemanticRange.valid?(version, loose: loose)).to eq(true), "#{tuple}"
+    end
+
+    [
+      ['01.2.3'],
+      ['1.0.0 - 2.0.0'],
+      ['^1.2.3+build'],
+      ['1.2.3-pre+asdf - 2.4.3-pre+asdf'],
+      [''],
+      ['*'],
+    ].each do |tuple|
+      version = tuple[0]
+      loose = tuple[1]
+      expect(SemanticRange.valid?(version, loose: loose)).to eq(false), "#{tuple}"
+    end
+  end
+
   it 'range' do
     [
       ['1.0.0 - 2.0.0', '1.2.3'],
