@@ -231,7 +231,7 @@ module SemanticRange
     return false if stripped_version.length > MAX_LENGTH
 
     rxp = loose ? LOOSE : FULL
-    return !!rxp.match(stripped_version)
+    return rxp.match?(stripped_version)
   end
 
   def self.valid(version, loose: false)
