@@ -15,5 +15,9 @@ Gem::Specification.new do |spec|
   spec.files         = Dir['lib/**/*'] + ['README.md', 'LICENSE.txt']
   spec.require_paths = ['lib']
 
+  if spec.respond_to?(:metadata)
+    spec.metadata['rubygems_mfa_required'] = 'true'
+  end
+
   spec.add_development_dependency 'rspec', '~> 3.4'
 end
