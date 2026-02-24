@@ -66,20 +66,15 @@ module SemanticRange
       prerelease <=> other.prerelease
     end
 
-    def self.compare_identifiers(a,b)
-      anum = /^[0-9]+$/.match(a.to_s)
-      bnum = /^[0-9]+$/.match(b.to_s)
-
-      if anum && bnum
-        a = a.to_i
-        b = b.to_i
-      end
+    def self.compare_identifiers(a, b)
+      anum = a.is_a?(Integer)
+      bnum = b.is_a?(Integer)
 
       return (anum && !bnum) ? -1 :
              (bnum && !anum) ? 1 :
              a < b ? -1 :
              a > b ? 1 :
-             0;
+             0
     end
 
     def increment!(release, identifier)

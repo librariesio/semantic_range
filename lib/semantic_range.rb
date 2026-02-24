@@ -1,3 +1,4 @@
+require "semantic_range/lru_cache"
 require "semantic_range/version"
 require "semantic_range/pre_release"
 require "semantic_range/range"
@@ -44,6 +45,10 @@ module SemanticRange
   ANY = {}
 
   MAX_LENGTH = 256
+
+  VERSION_CACHE       = LRUCache.new(1000)
+  VERSION_CACHE_LOOSE = LRUCache.new(1000)
+  RANGE_CACHE         = LRUCache.new(256)
 
   class InvalidIncrement < StandardError; end
   class InvalidVersion < StandardError; end
@@ -149,11 +154,12 @@ module SemanticRange
   end
 
   def self.satisfies?(version, range, loose: false, platform: nil)
-    if valid?(range, loose: loose) 
+    if valid?(range, loose: loose)
       return version == range
     end
-    return false if !valid_range(range, loose: loose, platform: platform)
-    Range.new(range, loose: loose, platform: platform).test(version)
+    r = cached_range(range, loose: loose, platform: platform)
+    return false unless r
+    r.test(cached_version(version, loose: loose))
   end
 
   def self.filter(versions, range, loose: false, platform: nil)
@@ -171,17 +177,15 @@ module SemanticRange
   end
 
   def self.valid_range(range, loose: false, platform: nil)
-    begin
-      r = Range.new(range, loose: loose, platform: platform).range
-      r = '*' if r.nil? || r.empty?
-      r
-    rescue
-      nil
-    end
+    r = cached_range(range, loose: loose, platform: platform)
+    return nil unless r
+    result = r.range
+    result = '*' if result.nil? || result.empty?
+    result
   end
 
   def self.compare(a, b, loose: false)
-    Version.new(a, loose: loose).compare(b)
+    cached_version(a, loose: loose).compare(cached_version(b, loose: loose))
   end
 
   def self.compare_loose(a, b)
@@ -271,6 +275,32 @@ module SemanticRange
   def self.to_comparators(range, loose: false, platform: nil)
     Range.new(range, loose: loose, platform: platform).set.map do |comp|
       comp.map(&:to_s)
+    end
+  end
+
+  class << self
+    private
+
+    def cached_version(version, loose:)
+      return version if version.is_a?(Version)
+      cache = loose ? VERSION_CACHE_LOOSE : VERSION_CACHE
+      cached = cache[version]
+      return cached unless cached.equal?(LRUCache::NOT_FOUND)
+      cache[version] = Version.new(version, loose: loose)
+    end
+
+    def cached_range(range, loose:, platform:)
+      return range if range.is_a?(Range)
+      key = [range, loose, platform]
+      cached = RANGE_CACHE[key]
+      unless cached.equal?(LRUCache::NOT_FOUND)
+        return cached  # may be nil for invalid ranges
+      end
+      begin
+        RANGE_CACHE[key] = Range.new(range, loose: loose, platform: platform)
+      rescue InvalidRange
+        RANGE_CACHE[key] = nil
+      end
     end
   end
 
