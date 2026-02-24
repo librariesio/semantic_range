@@ -152,8 +152,11 @@ module SemanticRange
     if valid?(range, loose: loose) 
       return version == range
     end
-    return false if !valid_range(range, loose: loose, platform: platform)
-    Range.new(range, loose: loose, platform: platform).test(version)
+    begin
+      Range.new(range, loose: loose, platform: platform).test(version)
+    rescue
+      false
+    end
   end
 
   def self.filter(versions, range, loose: false, platform: nil)
